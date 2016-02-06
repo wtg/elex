@@ -1,0 +1,29 @@
+{
+  "name": "elex",
+  "description": "A voting system",
+  "main": "server.js",
+  "authors": [
+    "TBD"
+  ],
+  "license": "Apache-2.0",
+  "keywords": [
+    "voting",
+    "system",
+    "elex",
+    "student",
+    "government",
+    "rpi"
+  ],
+  "moduleType": [
+    "node"
+  ],
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "public/lib",
+    "test",
+    "tests"
+  ]
+}

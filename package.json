@@ -1,0 +1,27 @@
+{
+  "name": "elex",
+  "version": "1.0.0",
+  "description": "A voting system",
+  "main": "server.js",
+  "scripts": {
+    "test": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wtg/elex.git"
+  },
+  "keywords": [
+    "voting",
+    "system",
+    "elex",
+    "student",
+    "government",
+    "rpi"
+  ],
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/wtg/elex/issues"
+  },
+  "homepage": "https://github.com/wtg/elex#readme"
+}
