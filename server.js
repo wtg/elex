@@ -1,12 +1,35 @@
 // server.js
 
 // modules =================================================
-var express        = require('express');
-var app            = express();
-var bodyParser     = require('body-parser');
-var methodOverride = require('method-override');
+var express           = require('express');
+var app               = express();
+var server            = require('http').Server(app);
+var bodyParser        = require('body-parser');
+var methodOverride    = require('method-override');
+var io                = require('socket.io')(server);
+var session           = require('express-session');
+var CASAuthentication = require('cas-authentication');
 
 // configuration ===========================================
+
+app.use( session({
+    secret            : 'super secret key',
+    resave            : false,
+    saveUninitialized : true
+}));
+
+var cas = new CASAuthentication({
+    cas_url     : 'https://my-cas-host.com/cas',
+    service_url : 'https://my-service-host.com'
+});
+
+io.on('connection', function (socket) {
+  console.log(socket.request.client);
+  // socket.emit('socket_req', socket.request.client);
+  socket.on('my other event', function (data) {
+    console.log(data);
+  });
+});
 
 // config files
 var db = require('./config/db');
@@ -34,12 +57,15 @@ app.use(methodOverride('X-HTTP-Method-Override'));
 // set the static files location (ex. /public/img will be /img for users)
 app.use(express.static(__dirname + '/public'));
 
+app.get('/', cas.bounce, function ( req, res ) {
+    res.sendFile("public/index.html");
+});
+
 // routes ==================================================
 require('./app/routes')(app); // configure our routes
 
 // start app ===============================================
-// startup our app at http://localhost:8080
-app.listen(port);
+server.listen(port);
 
 console.log(" ______ _      ________   __\n|  ____| |    |  ____\\ \\ \/ \/\n| |__  | |    | |__   \\ V \/ \n|  __| | |    |  __|   > <  \n| |____| |____| |____ \/ . \\ \n|______|______|______\/_\/ \\_\\\n");
 
