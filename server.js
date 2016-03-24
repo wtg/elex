@@ -9,17 +9,12 @@ var methodOverride    = require('method-override');
 var io                = require('socket.io')(server);
 var session           = require('express-session');
 var CASAuthentication = require('cas-authentication');
-var MongoClient       = require('mongodb').MongoClient;
-var assert            = require('assert');
+var mongoose          = require('mongoose');
 
 // configuration ===========================================
 
-var url = 'mongodb://localhost:3000/test';
-MongoClient.connect(url, function(err, db) {
-  assert.equal(null, err);
-  console.log("Connected correctly to server.");
-  db.close();
-});
+//connect to mongodb
+mongoose.connect('mongodb://localhost/elex');
 
 app.use( session({
     secret            : 'super secret key',
@@ -36,7 +31,7 @@ io.on('connection', function (socket) {
   //console.log(socket.request.client);
   // socket.emit('socket_req', socket.request.client);
   socket.on('my other event', function (data) {
-    console.log(data);
+    console.log(data.session[cas.session_name]);
   });
 });
 
@@ -69,6 +64,8 @@ app.use(express.static('public'));
 app.get('/auth', cas.bounce, function ( req, res ) {
     res.sendFile(__dirname + '/public/main_menu.html');
 });
+
+app.get('/logout', cas.logout);
 
 app.get('/vote', cas.bounce, function ( req, res ) {
     res.sendFile(__dirname + '/public/pin.html');
