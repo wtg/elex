@@ -39,7 +39,7 @@ var group = new mongoose.Schema({
 var users = mongoose.model('user', user);
 var votes = mongoose.model('vote', vote);
 var elections = mongoose.model('election', election);
-var group = mongoose.model('group', group);
+var groups = mongoose.model('group', group);
 
 //establish new session
 app.use( session({
@@ -54,16 +54,26 @@ var cas = new CASAuthentication({
 });
 
 io.on('connection', function (socket) {
-  //console.log(socket.request.client);
-  // socket.emit('socket_req', socket.request.client);
-  socket.on('my other event', function (data) {
-    console.log(data.session[cas.session_name]);
-  });
+    //console.log(socket.request.client);
+    // socket.emit('socket_req', socket.request.client);
+    socket.on('my other event', function (data) {
+        console.log(data.session[cas.session_name]);
+    });
 
-  //if user creates a group, add to the database
-  socket.on('create group', function( info ){
-
-  });
+    //if user creates a group, add to the database
+    socket.on('new group', function( info ){
+        var g = groups({
+            name : info.name,
+            desc : info.desc
+        });
+        g.save(function (err, saved) {
+            if (err) {
+                return console.log('error saving to db');
+            }else{
+                console.log(info.desc);
+            }
+        })
+    });
 });
 
 // config files
@@ -93,7 +103,11 @@ app.use(methodOverride('X-HTTP-Method-Override'));
 app.use(express.static('public'));
 
 app.get('/auth', cas.bounce, function ( req, res ) {
+
+    //gets your rcsid from cas
     var rcsID = req.session[cas.session_name];
+
+    //searches to see if rcsID is already in db
     users.findOne({'name' : rcsID}, function(err, user){
         if(err){ console.log(err); }
         else if(!user){
