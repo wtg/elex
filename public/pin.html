@@ -18,7 +18,7 @@
     }
     .vote-details {
       color: white;
-      margin-bottom: 15%;
+      margin-top: 1%;
       font-size: 30px;
     }
     .vote-buttons {
@@ -28,41 +28,37 @@
       color: white;
       font-size: 20px;
     }
+    .btn{
+      width: 50%;
+      float:left;
+    }
+    .form-control{
+      margin-bottom:10px;
+    }
   </style>
 </head>
 <body style="background-color: rgb(33,37,46)">
   <div class="container">
     <div class="row">
       <div class="col-xs-12">
-        <h1 class="text-center header">Welcome to Elex</h1>
-        <form method="get" action="createGroup.html" class="col-md-16 text-center">
-          <button type="submit" class="btn btn-primary btn-lg group-button">
-            Create Group
-          </button>
-        </form>
+        <h1 class="text-center header">Create a New Group</h1>
       </div>
     </div>
     <div class="row vote-buttons">
-      <form method="get" action="/vote" class="col-md-4 text-center">
-        <button type="submit" class="btn btn-danger btn-lg group-button">
-          Student Gov
-        </button>
-      </form>
-      <form method="get" action="/auth" class="col-md-4 text-center">
-        <button type="submit" class="btn btn-danger btn-lg group-button">
-          Web Sci Group
-        </button>
-      </form>
-      <form method="get" action="/auth" class="col-md-4 text-center">
-        <button type="submit" class="btn btn-danger btn-lg group-button">
-          The Poly
-        </button>
-      </form>
-      <form method="get" action="/auth" class="col-md-4 text-center">
-        <button type="submit" class="btn btn-danger btn-lg group-button">
-          Cheese
-        </button>
-      </form>
+      <div class="col-md-16">
+        <form method="get" action="vote.html">
+          <label for="pin" class="vote-details">Enter PIN:</label>
+          <input type="text" class="form-control" id="pin"/>
+          <button type="submit" class="btn btn-success btn-lg group-button text-center">
+            Submit
+          </button>
+        </form>
+        <form method="get" action="main_menu.html">
+          <button type="submit" class="btn btn-danger btn-lg group-button text-center">
+            Cancel
+          </button>
+        </form>
+      </div>
     </div>
     <div class="row">
       <div class="col-xs-12">

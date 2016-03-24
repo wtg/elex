@@ -9,8 +9,17 @@ var methodOverride    = require('method-override');
 var io                = require('socket.io')(server);
 var session           = require('express-session');
 var CASAuthentication = require('cas-authentication');
+var MongoClient       = require('mongodb').MongoClient;
+var assert            = require('assert');
 
 // configuration ===========================================
+
+var url = 'mongodb://localhost:3000/test';
+MongoClient.connect(url, function(err, db) {
+  assert.equal(null, err);
+  console.log("Connected correctly to server.");
+  db.close();
+});
 
 app.use( session({
     secret            : 'super secret key',
@@ -62,7 +71,7 @@ app.get('/auth', cas.bounce, function ( req, res ) {
 });
 
 app.get('/vote', cas.bounce, function ( req, res ) {
-    res.sendFile(__dirname + '/public/main_menu.html');
+    res.sendFile(__dirname + '/public/pin.html');
 });
 
 // routes ==================================================
