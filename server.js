@@ -74,6 +74,13 @@ io.on('connection', function (socket) {
             }
         })
     });
+
+    //get all groups
+    socket.on('fetch groups', function(){
+        groups.find({}, function(err, docs){
+            socket.emit('groups response', docs);
+        });        
+    });
 });
 
 // config files

@@ -43,25 +43,10 @@
         </form>
       </div>
     </div>
-    <div class="row vote-buttons">
+    <div class="row vote-buttons" id="groups">
       <form method="get" action="/vote" class="col-md-4 text-center">
         <button type="submit" class="btn btn-danger btn-lg group-button">
           Student Gov
-        </button>
-      </form>
-      <form method="get" action="/auth" class="col-md-4 text-center">
-        <button type="submit" class="btn btn-danger btn-lg group-button">
-          Web Sci Group
-        </button>
-      </form>
-      <form method="get" action="/auth" class="col-md-4 text-center">
-        <button type="submit" class="btn btn-danger btn-lg group-button">
-          The Poly
-        </button>
-      </form>
-      <form method="get" action="/auth" class="col-md-4 text-center">
-        <button type="submit" class="btn btn-danger btn-lg group-button">
-          Cheese
         </button>
       </form>
     </div>
@@ -83,6 +68,13 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
       var socket = io.connect('http://localhost:3000');
+      socket.emit('fetch groups');
+      socket.on('groups response', function(data){
+        data.forEach(function(arr){
+          $("#groups").html($("#groups").html() + "<form class=\"col-md-4 text-center\"><button type=\"submit\" class=\"btn btn-danger btn-lg group-button\">" + arr.name +
+        "</button></form>");
+        });
+      });
       socket.on('socket_req', function (data) {
 //        console.log(data);
 //        socket.emit('my other event', { my: 'data' });
