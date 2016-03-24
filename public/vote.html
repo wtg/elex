@@ -4,8 +4,8 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
   integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
   <style>
-    .sign-in-button {
-      width: 100%;
+    .vote-button {
+      width: 260px;
       height: 150px;
       font-size: 40px;
     }
@@ -33,25 +33,40 @@
   <div class="container">
     <div class="row">
       <div class="col-xs-12">
-        <h1 class="text-center header">Elex Voting System</h1>
-        <h2 class="text-center vote-details">Sign in to continue</h2>
+        <h1 class="text-center header">General Body Meeting: Jan. 27</h1>
+        <h2 class="text-center vote-details">You are voting on: Motion #2</h2>
       </div>
     </div>
     <div class="row vote-buttons">
-      <form method="get" action="/auth" class="col-md-16 text-center">
-        <button type="submit" class="btn btn-danger btn-lg sign-in-button">
-          Sign In
+      <div class="col-md-4 text-center">
+        <button class="btn btn-success btn-lg vote-button">
+          <i class="fa fa-thumbs-up"></i>
+          Yes
         </button>
-      </form>
+      </div>
+      <div class="col-md-4 text-center">
+        <button class="btn btn-danger btn-lg vote-button">
+          <i class="fa fa-thumbs-down"></i>
+          No
+        </button>
+      </div>
+      <div class="col-md-4 text-center">
+        <button class="btn btn-primary btn-lg vote-button">Abstain</button>
+      </div>
     </div>
     <div class="row">
       <div class="col-xs-12">
         <h2 class="text-center user-details">
-          A Web Science Systems Development Project
+          46th Student Senate
         </h2>
         <h2 class="text-center user-details">
-          Created by Justin Etzine, Steve Cardozo, Sensen Chen, Sam Fok, and Tristan Villamil
+          Signed in as Richard Plotka (plotkr2)
         </h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-12 text-center">
+        <button class="btn btn-default btn-sm" style="margin-top: 1%">Sign Out</button>
       </div>
     </div>
   </div>

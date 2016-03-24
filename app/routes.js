@@ -10,16 +10,11 @@ module.exports = function(app) {
 
   // sample api route
   app.get('/api/example', function(req, res) {
-    // use mongoose to get all example in the database
-    Nerd.find(function(err, example) {
+    res.sendFile(__dirname + '../public/index.html');
+  });
 
-      // if there is an error retrieving, send the error.
-      // nothing after res.send(err) will execute
-      if (err)
-      res.send(err);
-
-      res.json(example); // return all example in JSON format
-    });
+  app.get('/', function(req, res) {
+    console.log("?QuestionMark");
   });
 
   // route to handle creating goes here (app.post)
