@@ -15,7 +15,33 @@ var mongoose          = require('mongoose');
 
 //connect to mongodb
 mongoose.connect('mongodb://localhost/elex');
+var Schema = mongoose.Schema, ObjectId = Schema.ObjectId;
+// mongodb schemas
+var user = new mongoose.Schema({
+  name: String,
+  ID: ObjectId
+});
+var vote = new mongoose.Schema({
+  result: String,
+  ID: ObjectId
+});
+var election = new mongoose.Schema({
+  name: String,
+  desc: String,
+  result: String,
+  ID: ObjectId
+});
+var group = new mongoose.Schema({
+  name: String,
+  desc: String,
+  ID: ObjectId
+});
+var users = mongoose.model('user', user);
+var votes = mongoose.model('vote', vote);
+var elections = mongoose.model('election', election);
+var group = mongoose.model('group', group);
 
+//establish new session
 app.use( session({
     secret            : 'super secret key',
     resave            : false,
@@ -32,6 +58,11 @@ io.on('connection', function (socket) {
   // socket.emit('socket_req', socket.request.client);
   socket.on('my other event', function (data) {
     console.log(data.session[cas.session_name]);
+  });
+
+  //if user creates a group, add to the database
+  socket.on('create group', function( info ){
+
   });
 });
 
@@ -62,6 +93,22 @@ app.use(methodOverride('X-HTTP-Method-Override'));
 app.use(express.static('public'));
 
 app.get('/auth', cas.bounce, function ( req, res ) {
+    var rcsID = req.session[cas.session_name];
+    users.findOne({'name' : rcsID}, function(err, user){
+        if(err){ console.log(err); }
+        else if(!user){
+            var u = new users({
+                name : rcsID
+            });
+            u.save(function (err, saved) {
+                if (err) {
+                    return console.log('error saving to db');
+                }else{
+                    console.log("please?");
+                }
+            })
+        }
+    });
     res.sendFile(__dirname + '/public/main_menu.html');
 });
 
