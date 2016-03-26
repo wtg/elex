@@ -1,61 +1,64 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
-  integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
- <link rel="stylesheet" type="text/css" href="vote.css">
- 
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+	integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="vote.css">
 </head>
-<body style="background-color: rgb(33,37,46)">
-  <div class="container">
-    <div class="row">
-      <div class="col-xs-12">
-        <h1 class="text-center header">General Body Meeting: Jan. 27</h1>
-        <h2 class="text-center vote-details">You are voting on: Motion #2</h2>
-      </div>
-    </div>
-    <div class="row vote-buttons">
-      <div class="col-md-4 text-center">
-        <button class="btn btn-success btn-lg vote-button">
-          <i class="fa fa-thumbs-up"></i>
-          Yes
-        </button>
-      </div>
-      <div class="col-md-4 text-center">
-        <button class="btn btn-danger btn-lg vote-button">
-          <i class="fa fa-thumbs-down"></i>
-          No
-        </button>
-      </div>
-      <div class="col-md-4 text-center">
-        <button class="btn btn-primary btn-lg vote-button">Abstain</button>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-xs-12">
-        <h2 class="text-center user-details">
-          46th Student Senate
-        </h2>
-        <h2 class="text-center user-details">
-          Signed in as Richard Plotka (plotkr2)
-        </h2>
-      </div>
-    </div>
-    <div class="row">
-      <form method="get" action="/logout" class="col-xs-12 text-center">
-        <button class="btn btn-default btn-sm" style="margin-top: 1%">Sign Out</button>
-      </form>
-    </div>
-  </div>
 
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
+<body style="background-color: rgb(33,37,46)">
+	<div class="container">
+		<div class="row">
+			<div class="col-xs-12">
+				<h1 class="text-center header">General Body Meeting: Jan. 27</h1>
+				<h2 class="text-center vote-details">You are voting on: Motion #2</h2>
+			</div>
+		</div>
+		
+		<div class="row vote-buttons">
+			<div class="col-md-4 text-center">
+				<button class="btn btn-success btn-lg vote-button">
+				<i class="fa fa-thumbs-up"></i>
+				Yes
+				</button>
+			</div>
+			<div class="col-md-4 text-center">
+				<button class="btn btn-danger btn-lg vote-button">
+				<i class="fa fa-thumbs-down"></i>
+				No
+				</button>
+			</div>
+		  <div class="col-md-4 text-center">
+				<button class="btn btn-primary btn-lg vote-button">Abstain</button>
+			</div>
+		</div>
+		
+		<div class="row">
+			<div class="col-xs-12">
+				<h2 class="text-center user-details">
+				46th Student Senate
+				</h2>
+				<h2 class="text-center user-details">
+				Signed in as Richard Plotka (plotkr2)
+				</h2>
+			</div>
+		</div>
+		
+		<div class="row">
+			<form method="get" action="/logout" class="col-xs-12 text-center">
+				<button class="btn btn-default btn-sm" style="margin-top: 1%">Sign Out</button>
+			</form>
+		</div>
+	</div>
+
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
     integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
     crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-      var socket = io.connect('http://localhost:3000');
-      socket.on('socket_req', function (data) {
+		var socket = io.connect('http://localhost:3000');
+		socket.on('socket_req', function (data) {
 //        console.log(data);
 //        socket.emit('my other event', { my: 'data' });
       });
