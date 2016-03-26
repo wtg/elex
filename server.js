@@ -10,8 +10,14 @@ var io                = require('socket.io')(server);
 var session           = require('express-session');
 var CASAuthentication = require('cas-authentication');
 var mongoose          = require('mongoose');
+var cms               = require('cms-api')("<token here>");
 
 // configuration ===========================================
+
+//cms
+cms.getRCS('etzinj').then(function (response) {
+    console.log(response);
+});
 
 //connect to mongodb
 mongoose.connect('mongodb://localhost/elex');
@@ -23,17 +29,22 @@ var user = new mongoose.Schema({
 });
 var vote = new mongoose.Schema({
   result: String,
+  elect: Number,
+  user: Number,
   ID: ObjectId
 });
 var election = new mongoose.Schema({
   name: String,
   desc: String,
   result: String,
+  group: Number,
+  pin: Number,
   ID: ObjectId
 });
 var group = new mongoose.Schema({
   name: String,
   desc: String,
+  admin: Number,
   ID: ObjectId
 });
 var users = mongoose.model('user', user);
@@ -49,8 +60,9 @@ app.use( session({
 }));
 
 var cas = new CASAuthentication({
-    cas_url     : 'https://cas-auth.rpi.edu/cas',
-    service_url : 'http://localhost:3000/auth?'
+    cas_url      : 'https://cas-auth.rpi.edu/cas',
+    service_url  : 'http://localhost:3000/auth?',
+    cas_dev_mode : true
 });
 
 io.on('connection', function (socket) {
