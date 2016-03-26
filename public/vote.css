@@ -1,0 +1,23 @@
+.vote-button {
+  width: 260px;
+  height: 150px;
+  font-size: 40px;
+}
+.header {
+  margin-top: 5%;
+  color: white;
+  margin-bottom: 15%;
+  font-size: 80px;
+}
+.vote-details {
+  color: white;
+  margin-bottom: 15%;
+  font-size: 30px;
+}
+.vote-buttons {
+  margin-bottom: 7%;
+}
+.user-details {
+  color: white;
+  font-size: 20px;
+}
