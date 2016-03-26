@@ -18,5 +18,6 @@ Thumbs.db
 
 node_modules/
 public/lib
+config.js
 
 .idea/

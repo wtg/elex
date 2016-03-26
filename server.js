@@ -10,7 +10,8 @@ var io                = require('socket.io')(server);
 var session           = require('express-session');
 var CASAuthentication = require('cas-authentication');
 var mongoose          = require('mongoose');
-var cms               = require('cms-api')("<token here>");
+var config            = require('./config.js');
+var cms               = require('cms-api')(config.cms_api_token);
 
 // configuration ===========================================
 

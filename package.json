@@ -28,6 +28,7 @@
     "angular": "^1.5.2",
     "body-parser": "^1.14.2",
     "cas-authentication": "0.0.8",
+    "cms-api": "^0.1.0",
     "express": "^4.13.4",
     "express-session": "^1.13.0",
     "method-override": "^2.3.5",
