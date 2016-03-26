@@ -16,7 +16,7 @@ var cms               = require('cms-api')(config.cms_api_token);
 // configuration ===========================================
 
 //cms
-cms.getRCS('etzinj').then(function (response) {
+cms.getRCS('villat2').then(function (response) {
     console.log(response);
 });
 
@@ -38,19 +38,27 @@ var election = new mongoose.Schema({
   name: String,
   desc: String,
   result: String,
-  group: Number,
+  meeting: Number,
+  ID: ObjectId
+});
+var meeting = new mongoose.Schema({
+  name: String,
+  date: Date,
   pin: Number,
+  group: Number,
   ID: ObjectId
 });
 var group = new mongoose.Schema({
   name: String,
   desc: String,
   admin: Number,
+  allowed: Array,
   ID: ObjectId
 });
 var users = mongoose.model('user', user);
 var votes = mongoose.model('vote', vote);
 var elections = mongoose.model('election', election);
+var meetings = mongoose.model('meetings', meeting);
 var groups = mongoose.model('group', group);
 
 //establish new session
