@@ -29,3 +29,11 @@
 .form-control{
   margin-bottom:10px;
 }
+.cancel-button{
+  background-image:url("/cancelButton.png");
+  background-color:transparent;
+  width:20px;
+  height:20px;
+  border:0;
+  margin-left:10px;
+}

@@ -11,41 +11,29 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-xs-12">
-				<h1 class="text-center header">Create a New Poll</h1>
+				<h1 class="text-center header">Create a New Meeting</h1>
 			</div>
 		</div>
-
+		
 		<div class="row vote-buttons">
 			<div class="col-md-16">
-				<form method="post" id="myform" action="/executeCreation">
-					<label for="name" class="vote-details">Poll Name:</label>
-					<input type="text" class="form-control" name="name" id="name"/>
-
-					<label for="desc" class="vote-details">Description:</label>
-					<textarea type="text" rows="5" class="form-control" name="desc" id="desc"></textarea>
-					
-					<label for="options" class="vote-details">Poll Options:</label>
-					<ul id="options"></ul>
-					<div class="row">
-						<div class="col-md-4">
-							<input id="newOption" type="text" class="form-control" placeholder="+  New option">
-						</div>
-						<button type="button" onclick="addOption()">Add</button>							
-					</div>
-					
-					<button type="submit" class="btn btn-success btn-lg group-button text-center" id="submit">
-						Submit
-					</button>
+				<form method="get" action="main_menu.html">
+				<label for="name" class="vote-details">Meeting Name:</label>
+				<input type="text" class="form-control" id="name"/>
+				<label for="pin" class="vote-details">PIN:</label>
+				<input type="text" class="form-control" id="pin"/>
+				<button type="submit" class="btn btn-success btn-lg group-button text-center" id="submit">
+					Submit
+				</button>
 				</form>
 				<form method="get" action="/">
 				<button type="submit" class="btn btn-danger btn-lg group-button text-center">
 					Cancel
 				</button>
 				</form>
-				<button type="button" onclick="getPollOptions()">Get Poll Options</button>
 			</div>
 		</div>
-
+		
 		<div class="row">
 			<div class="col-xs-12">
 				<h2 class="text-center user-details">
@@ -63,27 +51,9 @@
     crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-		function addOption()	{
-			$("#options").append("<li class=user-details>"+$("#newOption").val()+"<button type=button class=cancel-button onclick=removeOption(this)></button></li>");
-			$("#newOption").val("");
-		}
-		function removeOption(option) {
-			$(option).parent().remove();
-		}
-		
-		function getPollOptions() {
-			options=[];
-			$("#options li").each(function( index ) {
-				options.push($(this).text());
-			});
-			console.log( options);
-		}
-
-		
-		
 		var socket = io.connect('http://localhost:3000');
 		$("#submit").click(function(){
-			socket.emit('new group', {name : $("#name").val(), desc : $("#desc").val()});
+			socket.emit('new meeting', {name : $("#name").val(), pin : $("#pin").val()});
 		});
 		socket.on('socket_req', function (data) {
 //        console.log(data);

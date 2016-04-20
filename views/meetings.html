@@ -4,26 +4,26 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
 	integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-	<link rel="stylesheet" type="text/css" href="mainmenu.css">
+	<link rel="stylesheet" type="text/css" href="/mainmenu.css">
 </head>
 
 <body style="background-color: rgb(33,37,46)">
 	<div class="container">
 		<div class="row">
 			<div class="col-xs-12">
-				<h1 class="text-center header">Welcome to Elex</h1>
+				<h1 class="text-center header">Meetings</h1>
 			</div>
 		</div>
 
 		<div class="row">
-			<form method="get" action="/creategroup" class="col-md-16 text-center">
+			<form method="get" action="/createmeeting" class="col-md-16 text-center">
 				<button type="submit" class="btn btn-primary btn-lg group-button">
-					Create Group
+					Create Meeting
 				</button>
 			</form>
 		</div>
 
-		<div class="row vote-buttons" id="groups"></div>
+		<div class="row vote-buttons" id="meetings"></div>
 
 		<div class="row">
 			<div class="col-xs-12">
@@ -42,9 +42,9 @@
     crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-		$.get('/api/groups', function (response) {
+		$.get('/api/meetings', function (response) {
 			response.forEach(function(arr){
-				$("#groups").html($("#groups").html() + "<form method=\"get\" action=\"/joinvote/" + arr._id + "\" class=\"col-md-4 text-center\"><button type=\"submit\" class=\"btn btn-danger btn-lg group-button\">" + arr.name +
+				$("#meetings").html($("#meetings").html() + "<form method=\"get\" action=\"/polls/" + arr._id + "\" class=\"col-md-4 text-center\"><button type=\"submit\" class=\"btn btn-danger btn-lg group-button\">" + arr.name +
 				"</button></form>");
 			});
 		});

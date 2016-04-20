@@ -90,6 +90,21 @@ io.on('connection', function (socket) {
             }
         })
     });
+	
+	//if user creates a meeting, add to the database
+    socket.on('new meeting', function( info ){
+        var m = meetings({
+            name : info.name,
+            pin : info.pin
+        });
+        m.save(function (err, saved) {
+            if (err) {
+                return console.log('error saving to db');
+            }else{
+                console.log(info.name);
+            }
+        })
+    });
 });
 
 // config files
@@ -151,6 +166,12 @@ app.get('/api/groups', function (req, res) {
     });
 });
 
+app.get('/api/meetings', function (req, res) {
+    meetings.find({}, function(err, docs){
+        res.json(docs);
+    });
+});
+
 app.get('/', function (req, res) {
     if (!req.session[cas.session_name]) {
         res.sendFile(__dirname + '/views/index.html');
@@ -163,6 +184,14 @@ app.get('/logout', cas.logout);
 
 app.get('/creategroup', cas.block, function (req, res) {
     res.sendFile(__dirname + '/views/createGroup.html')
+});
+
+app.get('/createMeeting', cas.block, function (req, res) {
+    res.sendFile(__dirname + '/views/createMeeting.html')
+});
+
+app.get('/createPoll', cas.block, function (req, res) {
+    res.sendFile(__dirname + '/views/createPoll.html')
 });
 
 app.post('/executeCreation', cas.block, function (req, res) {
@@ -187,14 +216,33 @@ app.get('/joinvote/:key', cas.bounce, function (req, res) {
     var rcsID = req.session.cas_user;
     groups.findOne({'ID' : req.param.key}, function(err, group){
         users.findOne({'name' : rcsID}, function(err, user){
-            if(group["admin"] == user["ID"]){
+            /*
+			if(group["admin"] == user["ID"]){
                 res.sendFile(__dirname + '/views/createPoll.html');
             }else{
                 res.sendFile(__dirname + '/views/pin.html');
             }
+			*/
+			res.sendFile(__dirname + '/views/meetings.html');
         });
     });
-})
+});
+
+app.get('/polls/:key', cas.bounce, function (req, res) {
+    var rcsID = req.session.cas_user;
+    groups.findOne({'ID' : req.param.key}, function(err, group){
+        users.findOne({'name' : rcsID}, function(err, user){
+            /*
+			if(group["admin"] == user["ID"]){
+                res.sendFile(__dirname + '/views/createPoll.html');
+            }else{
+                res.sendFile(__dirname + '/views/pin.html');
+            }
+			*/
+			res.sendFile(__dirname + '/views/polls.html');
+        });
+    });
+});
 
 app.post('/vote', cas.block, function ( req, res ) {
     if (!req.body.pin) {
