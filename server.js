@@ -90,13 +90,6 @@ io.on('connection', function (socket) {
             }
         })
     });
-
-    //get all groups
-    socket.on('fetch groups', function(){
-        groups.find({}, function(err, docs){
-            socket.emit('groups response', docs);
-        });
-    });
 });
 
 // config files
@@ -128,7 +121,7 @@ app.use(express.static('public'));
 app.get('/auth', cas.bounce, function ( req, res ) {
 
     //gets your rcsid from cas
-    var rcsID = req.session[cas.session_name];
+    var rcsID = req.session.cas_user;
 
     //searches to see if rcsID is already in db
     users.findOne({'name' : rcsID}, function(err, user){
@@ -144,9 +137,18 @@ app.get('/auth', cas.bounce, function ( req, res ) {
                     console.log("please?");
                 }
             })
+
+
         }
+
+        res.sendFile(__dirname + '/views/main_menu.html');
     });
-    res.sendFile(__dirname + '/views/main_menu.html');
+});
+
+app.get('/api/groups', function (req, res) {
+    groups.find({}, function(err, docs){
+        res.json(docs);
+    });
 });
 
 app.get('/', function (req, res) {
@@ -163,9 +165,27 @@ app.get('/creategroup', cas.block, function (req, res) {
     res.sendFile(__dirname + '/views/createGroup.html')
 });
 
+app.post('/executeCreation', cas.block, function (req, res) {
+    if(!req.body || !req.body.name || !req.body.desc) {
+        res.redirect('/creategroup');
+        return;
+    }
+
+
+    users.findOne({'name' : req.session.cas_user}, function(err, user){
+        var group = new groups({
+            name: req.body.name,
+            desc: req.body.desc,
+            admin: user["ID"]
+        });
+
+        res.redirect('/auth');
+    });
+});
+
 app.get('/joinvote/:key', cas.bounce, function (req, res) {
     var rcsID = req.session.cas_user;
-    groups.findOne({'ID' : key}, function(err, group){
+    groups.findOne({'ID' : req.param.key}, function(err, group){
         users.findOne({'name' : rcsID}, function(err, user){
             if(group["admin"] == user["ID"]){
                 res.sendFile(__dirname + '/views/createGroup.html');

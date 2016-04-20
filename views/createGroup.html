@@ -4,7 +4,7 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
 	integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-	<link rel="stylesheet" type="text/css" href="createGroup.css">
+	<link rel="stylesheet" type="text/css" href="/createGroup.css">
 </head>
 
 <body style="background-color: rgb(33,37,46)">
@@ -14,26 +14,27 @@
 				<h1 class="text-center header">Create a New Group</h1>
 			</div>
 		</div>
-		
+
 		<div class="row vote-buttons">
 			<div class="col-md-16">
-				<form method="get" action="main_menu.html">
-				<label for="name" class="vote-details">Group Name:</label>
-				<input type="text" class="form-control" id="name"/>
-				<label for="desc" class="vote-details">Description:</label>
-				<textarea type="text" rows="5" class="form-control" id="desc"></textarea>
-				<button type="submit" class="btn btn-success btn-lg group-button text-center" id="submit">
-					Submit
-				</button>
+				<form method="post" action="/executeCreation">
+					<label for="name" class="vote-details">Group Name:</label>
+					<input type="text" class="form-control" name="name" id="name"/>
+
+					<label for="desc" class="vote-details">Description:</label>
+					<textarea type="text" rows="5" class="form-control" name="desc" id="desc"></textarea>
+					<button type="submit" class="btn btn-success btn-lg group-button text-center" id="submit">
+						Submit
+					</button>
 				</form>
-				<form method="get" action="main_menu.html">
+				<form method="get" action="/">
 				<button type="submit" class="btn btn-danger btn-lg group-button text-center">
 					Cancel
 				</button>
 				</form>
 			</div>
 		</div>
-		
+
 		<div class="row">
 			<div class="col-xs-12">
 				<h2 class="text-center user-details">

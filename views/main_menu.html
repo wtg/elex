@@ -20,13 +20,7 @@
 			</div>
 		</div>
 
-		<div class="row vote-buttons" id="groups">
-			<form method="get" action="/joinvote/" class="col-md-4 text-center">
-				<button type="submit" class="btn btn-danger btn-lg group-button">
-				Student Gov
-				</button>
-			</form>
-		</div>
+		<div class="row vote-buttons" id="groups"></div>
 
 		<div class="row">
 			<div class="col-xs-12">
@@ -45,18 +39,12 @@
     crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-		var socket = io.connect('http://localhost:3000');
-		socket.emit('fetch groups');
-		socket.on('groups response', function(data){
-			data.forEach(function(arr){
-				$("#groups").html($("#groups").html() + "<form class=\"col-md-4 text-center\"><button type=\"submit\" class=\"btn btn-danger btn-lg group-button\">" + arr.name +
+		$.get('/api/groups', function (response) {
+			response.forEach(function(arr){
+				$("#groups").html($("#groups").html() + "<form method=\"get\" action=\"/joinvote/" + arr._id + "\" class=\"col-md-4 text-center\"><button type=\"submit\" class=\"btn btn-danger btn-lg group-button\">" + arr.name +
 				"</button></form>");
 			});
 		});
-		socket.on('socket_req', function (data) {
-//        console.log(data);
-//        socket.emit('my other event', { my: 'data' });
-      });
     </script>
 </body>
 </html>
