@@ -163,8 +163,17 @@ app.get('/creategroup', cas.block, function (req, res) {
     res.sendFile(__dirname + '/views/createGroup.html')
 });
 
-app.get('/joinvote', cas.bounce, function (req, res) {
-    res.sendFile(__dirname + '/views/pin.html');
+app.get('/joinvote/:key', cas.bounce, function (req, res) {
+    var rcsID = req.session.cas_user;
+    groups.findOne({'ID' : key}, function(err, group){
+        users.findOne({'name' : rcsID}, function(err, user){
+            if(group["admin"] == user["ID"]){
+                res.sendFile(__dirname + '/views/createGroup.html');
+            }else{
+                res.sendFile(__dirname + '/views/pin.html');
+            }
+        });
+    });
 })
 
 app.post('/vote', cas.block, function ( req, res ) {
