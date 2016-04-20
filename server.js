@@ -30,15 +30,10 @@ var user = new mongoose.Schema({
 });
 var vote = new mongoose.Schema({
   result: String,
-  elect: Number,
-  user: Number,
-  ID: ObjectId
-});
-var election = new mongoose.Schema({
-  name: String,
-  desc: String,
-  result: String,
   meeting: Number,
+  user: Number,
+  name: String,
+  Description: String,
   ID: ObjectId
 });
 var meeting = new mongoose.Schema({
@@ -57,7 +52,6 @@ var group = new mongoose.Schema({
 });
 var users = mongoose.model('user', user);
 var votes = mongoose.model('vote', vote);
-var elections = mongoose.model('election', election);
 var meetings = mongoose.model('meetings', meeting);
 var groups = mongoose.model('group', group);
 
@@ -71,7 +65,8 @@ app.use( session({
 var cas = new CASAuthentication({
     cas_url      : 'https://cas-auth.rpi.edu/cas',
     service_url  : 'http://localhost:3000/auth?',
-    cas_dev_mode : true
+    cas_dev_mode : true,
+    cas_dev_user : 'etzinj'
 });
 
 io.on('connection', function (socket) {
@@ -100,7 +95,7 @@ io.on('connection', function (socket) {
     socket.on('fetch groups', function(){
         groups.find({}, function(err, docs){
             socket.emit('groups response', docs);
-        });        
+        });
     });
 });
 
@@ -151,13 +146,34 @@ app.get('/auth', cas.bounce, function ( req, res ) {
             })
         }
     });
-    res.sendFile(__dirname + '/public/main_menu.html');
+    res.sendFile(__dirname + '/views/main_menu.html');
 });
+
+app.get('/', function (req, res) {
+    if (!req.session[cas.session_name]) {
+        res.sendFile(__dirname + '/views/index.html');
+    } else {
+        res.redirect('/auth');
+    }
+})
 
 app.get('/logout', cas.logout);
 
-app.get('/vote', cas.bounce, function ( req, res ) {
-    res.sendFile(__dirname + '/public/pin.html');
+app.get('/creategroup', cas.block, function (req, res) {
+    res.sendFile(__dirname + '/views/createGroup.html')
+});
+
+app.get('/joinvote', cas.bounce, function (req, res) {
+    res.sendFile(__dirname + '/views/pin.html');
+})
+
+app.post('/vote', cas.block, function ( req, res ) {
+    if (!req.body.pin) {
+        res.redirect('/joinvote')
+        return;
+    }
+
+    res.sendFile(__dirname + '/views/vote.html');
 });
 
 // routes ==================================================

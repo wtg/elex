@@ -14,24 +14,24 @@
 				<h1 class="text-center header">Student Gov</h1>
 			</div>
 		</div>
-		
+
 		<div class="row vote-buttons">
 			<div class="col-md-16">
-				<form method="get" action="vote.html">
-				<label for="pin" class="vote-details">Enter PIN:</label>
-				<input type="text" class="form-control" id="pin"/>
-				<button type="submit" class="btn btn-success btn-lg group-button text-center">
-					Submit
-				</button>
+				<form method="post" action="/vote">
+					<label for="pin" class="vote-details">Enter PIN:</label>
+					<input type="text" class="form-control" name="pin" id="pin"/>
+					<button type="submit" class="btn btn-success btn-lg group-button text-center">
+						Submit
+					</button>
 				</form>
 				<form method="get" action="main_menu.html">
-				<button type="submit" class="btn btn-danger btn-lg group-button text-center">
-					Cancel
-				</button>
+					<button type="submit" class="btn btn-danger btn-lg group-button text-center">
+						Cancel
+					</button>
 				</form>
 			</div>
 		</div>
-		
+
 		<div class="row">
 			<div class="col-xs-12">
 				<h2 class="text-center user-details">
@@ -47,13 +47,5 @@
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
     integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
     crossorigin="anonymous"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-		var socket = io.connect('http://localhost:3000');
-		socket.on('socket_req', function (data) {
-//        console.log(data);
-//        socket.emit('my other event', { my: 'data' });
-		});
-    </script>
 </body>
 </html>
