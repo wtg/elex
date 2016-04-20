@@ -188,7 +188,7 @@ app.get('/joinvote/:key', cas.bounce, function (req, res) {
     groups.findOne({'ID' : req.param.key}, function(err, group){
         users.findOne({'name' : rcsID}, function(err, user){
             if(group["admin"] == user["ID"]){
-                res.sendFile(__dirname + '/views/createGroup.html');
+                res.sendFile(__dirname + '/views/createPoll.html');
             }else{
                 res.sendFile(__dirname + '/views/pin.html');
             }
