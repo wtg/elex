@@ -64,9 +64,10 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
 		function addOption()	{
-			$("#options").append("<li class=user-details>"+$("#newOption").val()+"<button type=button class=cancel-button onclick=removeOption(this)></button></li>");
+			$("#options").append("<li class=user-details><span contenteditable=true>"+$("#newOption").val()+"</span><button type=button class=cancel-button onclick=removeOption(this)></button></li>");
 			$("#newOption").val("");
 		}
+		
 		function removeOption(option) {
 			$(option).parent().remove();
 		}
@@ -78,8 +79,6 @@
 			});
 			console.log( options);
 		}
-
-		
 		
 		var socket = io.connect('http://localhost:3000');
 		$("#submit").click(function(){
