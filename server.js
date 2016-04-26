@@ -64,9 +64,9 @@ app.use( session({
 
 var cas = new CASAuthentication({
     cas_url      : 'https://cas-auth.rpi.edu/cas',
-    service_url  : 'http://localhost:3000/auth?',
+    service_url  : 'http://localhost:3000/auth?'/*,
     cas_dev_mode : true,
-    cas_dev_user : 'etzinj'
+    cas_dev_user : 'etzinj'*/
 });
 
 io.on('connection', function (socket) {
@@ -163,6 +163,14 @@ app.get('/auth', cas.bounce, function ( req, res ) {
 app.get('/api/groups', function (req, res) {
     groups.find({}, function(err, docs){
         res.json(docs);
+    });
+});
+
+app.get('/api/newGroups', function (req, res) {
+    cms.getRCS("etzinj").then(function (response) {
+        cms.getOrgs(JSON.parse(response)["student_id"]).then(function (docs){
+            res.json(JSON.parse(docs));
+        });
     });
 });
 

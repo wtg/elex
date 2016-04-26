@@ -11,38 +11,20 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-xs-12">
-				<h1 class="text-center header">Create a New Group</h1>
+				<h1 class="text-center header">Choose a group to add</h1>
 			</div>
 		</div>
 
-		<div class="row vote-buttons">
-			<div class="col-md-16">
-				<form method="post" action="/executeCreation">
-					<label for="name" class="vote-details">Group Name:</label>
-					<input type="text" class="form-control" name="name" id="name"/>
-
-					<label for="desc" class="vote-details">Description:</label>
-					<textarea type="text" rows="5" class="form-control" name="desc" id="desc"></textarea>
-					<button type="submit" class="btn btn-success btn-lg group-button text-center" id="submit">
-						Submit
-					</button>
-				</form>
-				<form method="get" action="/">
-				<button type="submit" class="btn btn-danger btn-lg group-button text-center">
-					Cancel
-				</button>
-				</form>
-			</div>
-		</div>
+		<div class="row vote-buttons" id="groups"></div>
 
 		<div class="row">
 			<div class="col-xs-12">
-				<h2 class="text-center user-details">
-				A Web Science Systems Development Project
-				</h2>
-				<h2 class="text-center user-details">
-				Created by Justin Etzine, Steve Cardozo, Sensen Chen, Sam Fok, and Tristan Villamil
-				</h2>
+			<h2 class="text-center user-details">
+			A Web Science Systems Development Project
+			</h2>
+			<h2 class="text-center user-details">
+			Created by Justin Etzine, Steve Cardozo, Sensen Chen, Sam Fok, and Tristan Villamil
+			</h2>
 			</div>
 		</div>
 	</div>
@@ -52,14 +34,21 @@
     crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-		var socket = io.connect('http://localhost:3000');
-		$("#submit").click(function(){
-			socket.emit('new group', {name : $("#name").val(), desc : $("#desc").val()});
+		$.get('/api/newGroups', function (response) {
+			response.forEach(function(arr){
+				$("#groups").html($("#groups").html() + "<form method=\"get\" action=\"/joinvote/" + arr._id + "\" class=\"col-md-4 text-center\"><button type=\"submit\" class=\"btn btn-danger btn-lg group-button\">" + arr.name +
+				"</button></form>");
+			});
 		});
-		socket.on('socket_req', function (data) {
-//        console.log(data);
-        socket.emit('my other event', { my: 'data' });
-		});
+
+// 		var socket = io.connect('http://localhost:3000');
+// 		$("#submit").click(function(){
+// 			socket.emit('new group', {name : $("#name").val(), desc : $("#desc").val()});
+// 		});
+// 		socket.on('socket_req', function (data) {
+// //        console.log(data);
+//         socket.emit('my other event', { my: 'data' });
+// 		});
     </script>
 </body>
 </html>
