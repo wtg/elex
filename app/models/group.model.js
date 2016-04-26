@@ -7,5 +7,5 @@ module.exports = mongoose.model('Group', {
   desc    : String,
   admin   : String,
   allowed : Array,
-  ID      : ObjectId
+  ID      : mongoose.Schema.ObjectId
 });

@@ -7,5 +7,5 @@ module.exports = mongoose.model('Meeting', {
   date  : Date,
   pin   : Number,
   group : Number,
-  ID    : ObjectId
+  ID    : mongoose.Schema.ObjectId
 });

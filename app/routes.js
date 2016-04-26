@@ -1,8 +1,5 @@
 // app/routes.js
 
-// grab the nerd model we just created
-var Example = require('./models/example.model.js');
-
 module.exports = function(app) {
   // server routes ===========================================================
   // handle things like api calls

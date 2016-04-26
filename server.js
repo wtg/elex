@@ -20,17 +20,40 @@ var cms               = require('cms-api')(config.cms_api_token);
 //     console.log(response);
 // });
 
-//connect to mongodb
-mongoose.connect('mongodb://localhost/elex');
-var Schema = mongoose.Schema, ObjectId = Schema.ObjectId;
+// config files
+var db = require('./config/db');
+
+// set our port
+var port = process.env.PORT || 3000;
+
+// connect to our mongoDB database
+// (uncomment after you enter in your own credentials in config/db.js)
+mongoose.connect(db.url);
+
+// get all data/stuff of the body (POST) parameters
+// parse application/json
+app.use(bodyParser.json());
+
+// parse application/vnd.api+json as json
+app.use(bodyParser.json({ type: 'application/vnd.api+json' }));
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// override with the X-HTTP-Method-Override header in the request. simulate DELETE/PUT
+app.use(methodOverride('X-HTTP-Method-Override'));
+
+// set the static files location (ex. /public/img will be /img for users)
+app.use(express.static('public'));
+
 // mongodb schemas
 var User     = require('./app/models/user.model.js');
 var Vote     = require('./app/models/vote.model.js');
 var Meeting  = require('./app/models/meeting.model.js');
-var groups   = require('./app/models/group.model.js');
+var Group   = require('./app/models/group.model.js');
 
 //establish new session
-app.use( session({
+app.use(session({
     secret            : 'super secret key',
     resave            : false,
     saveUninitialized : true
@@ -52,7 +75,7 @@ io.on('connection', function (socket) {
 
     //if user creates a group, add to the database
     socket.on('new group', function( info ){
-        var g = groups({
+        var g = Group({
             name : info.name,
             desc : info.desc
         });
@@ -78,71 +101,6 @@ io.on('connection', function (socket) {
                 console.log(info.name);
             }
         })
-    });
-});
-
-// config files
-var db = require('./config/db');
-
-// set our port
-var port = process.env.PORT || 3000;
-
-// connect to our mongoDB database
-// (uncomment after you enter in your own credentials in config/db.js)
-// mongoose.connect(db.url);
-
-// get all data/stuff of the body (POST) parameters
-// parse application/json
-app.use(bodyParser.json());
-
-// parse application/vnd.api+json as json
-app.use(bodyParser.json({ type: 'application/vnd.api+json' }));
-
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true }));
-
-// override with the X-HTTP-Method-Override header in the request. simulate DELETE/PUT
-app.use(methodOverride('X-HTTP-Method-Override'));
-
-// set the static files location (ex. /public/img will be /img for users)
-app.use(express.static('public'));
-
-app.get('/auth', cas.bounce, function ( req, res ) {
-
-    //gets your rcsid from cas
-    var rcsID = req.session.cas_user;
-
-    //searches to see if rcsID is already in db
-    User.findOne({'name' : rcsID}, function(err, user){
-        if(err){ console.log(err); }
-        else if(!user){
-            var u = new User({
-                name : rcsID
-            });
-            u.save(function (err, saved) {
-                if (err) {
-                    return console.log('error saving to db');
-                }else{
-                    console.log("please?");
-                }
-            })
-        }
-
-        res.sendFile(__dirname + '/views/main_menu.html');
-    });
-});
-
-app.get('/api/groups', function (req, res) {
-    groups.find({}, function(err, docs){
-        res.json(docs);
-    });
-});
-
-app.get('/api/newGroups', function (req, res) {
-    cms.getRCS("etzinj").then(function (response) {
-        cms.getOrgs(JSON.parse(response)["student_id"]).then(function (docs){
-            res.json(JSON.parse(docs));
-        });
     });
 });
 
@@ -184,7 +142,7 @@ app.get('/executeCreation/:key', cas.block, function (req, res) {
             var resp = JSON.parse(docs);
             resp.forEach(function(arr){
                 if(arr.entity_id == req.params.key){
-                    var g = groups({
+                    var g = Group({
                         name  : arr.name,
                         desc  : arr.description,
                         admin : req.session.cas_user
@@ -207,7 +165,7 @@ app.get('/executeCreation/:key', cas.block, function (req, res) {
 
 app.get('/joinvote/:key', cas.bounce, function (req, res) {
     var rcsID = req.session.cas_user;
-    groups.findOne({'ID' : req.param.key}, function(err, group){
+    Group.findOne({'ID' : req.param.key}, function(err, group){
         User.findOne({'name' : rcsID}, function(err, user){
             /*
 			if(group["admin"] == user["ID"]){
@@ -223,7 +181,7 @@ app.get('/joinvote/:key', cas.bounce, function (req, res) {
 
 app.get('/polls/:key', cas.bounce, function (req, res) {
     var rcsID = req.session.cas_user;
-    groups.findOne({'ID' : req.param.key}, function(err, group){
+    Group.findOne({'ID' : req.param.key}, function(err, group){
         User.findOne({'name' : rcsID}, function(err, user){
             /*
 			if(group["admin"] == user["ID"]){
@@ -248,6 +206,8 @@ app.post('/vote', cas.block, function ( req, res ) {
 
 // routes ==================================================
 require('./app/routes')(app); // configure our routes
+require('./app/routes/user.routes')(app, cas);
+require('./app/routes/group.routes')(app, cas);
 
 // start app ===============================================
 server.listen(port, function(){

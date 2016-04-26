@@ -8,5 +8,5 @@ module.exports = mongoose.model('Vote', {
   user        : Number,
   name        : String,
   Description : String,
-  ID          : Schema.ObjectId
+  ID          : mongoose.Schema.ObjectId
 });
