@@ -4,6 +4,15 @@ var cms    = require('cms-api')(config.cms_api_token);
 var Group  = require('../models/group.model.js');
 
 module.exports = function(app, cas) {
+    app.get('/groups', function (req, res) {
+        if(!req.session.cas_user) {
+            res.redirect('/auth');
+            return;
+        }
+        
+        res.sendFile(path.resolve('views/main_menu.html'));
+    });
+
     app.get('/api/groups', function (req, res) {
         if(!req.session.cas_user) {
             Group.find({}, function (err, groups) {

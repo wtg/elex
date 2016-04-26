@@ -61,9 +61,7 @@ app.use(session({
 
 var cas = new CASAuthentication({
     cas_url      : 'https://cas-auth.rpi.edu/cas',
-    service_url  : 'http://localhost:3000/auth?'/*,
-    cas_dev_mode : true,
-    cas_dev_user : 'etzinj'*/
+    service_url  : 'http://localhost:3000/auth?'
 });
 
 io.on('connection', function (socket) {
@@ -108,7 +106,7 @@ app.get('/', function (req, res) {
     if (!req.session[cas.session_name]) {
         res.sendFile(__dirname + '/views/index.html');
     } else {
-        res.redirect('/auth');
+        res.redirect('/groups');
     }
 })
 
@@ -149,7 +147,7 @@ app.get('/executeCreation/:key', cas.block, function (req, res) {
                         console.log(arr.name);
                     }
                 })
-                res.redirect('/auth');
+                res.redirect('/groups');
                 return;
             }
         });

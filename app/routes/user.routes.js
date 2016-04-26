@@ -23,7 +23,7 @@ module.exports = function(app, cas) {
                 })
             }
 
-            res.sendFile(path.resolve('views/main_menu.html'));
+            res.redirect('/groups');
         });
     });
 }
