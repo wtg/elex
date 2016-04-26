@@ -135,7 +135,7 @@ app.get('/createPoll', cas.block, function (req, res) {
 app.get('/executeCreation/:key', cas.block, function (req, res) {
     //change "etzinj" to "req.session.cas_user"
     //gets user's rin
-    cms.getRCS("etzinj").then(function (response) {
+    cms.getRCS(req.session.cas_user).then(function (response) {
         //gets user's clubs
         cms.getOrgs(JSON.parse(response)["student_id"]).then(function (docs){
             //parses response from string to json
