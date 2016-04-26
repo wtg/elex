@@ -9,7 +9,7 @@ module.exports = function(app, cas) {
     });
 
     app.get('/api/newGroups', function (req, res) {
-        cms.getRCS("etzinj").then(function (response) {
+        cms.getRCS(req.session.cas_user).then(function (response) {
             cms.getOrgs(JSON.parse(response)["student_id"]).then(function (docs){
                 res.json(JSON.parse(docs));
             });
