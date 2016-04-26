@@ -137,29 +137,29 @@ app.get('/executeCreation/:key', cas.block, function (req, res) {
     //gets user's rin
     cms.getRCS(req.session.cas_user).then(function (response) {
         //gets user's clubs
-        cms.getOrgs(JSON.parse(response)["student_id"]).then(function (docs){
-            //parses response from string to json
-            var resp = JSON.parse(docs);
-            resp.forEach(function(arr){
-                if(arr.entity_id == req.params.key){
-                    var g = Group({
-                        name  : arr.name,
-                        desc  : arr.description,
-                        admin : req.session.cas_user
-                    });
-                    g.save(function (err, saved) {
-                        if (err) {
-                            return console.log('error saving to db');
-                        }else{
-                            console.log(arr.name);
-                        }
-                    })
-                    res.redirect('/auth');
-                    return;
-                }
-            });
-            res.redirect('/createGroup');
+        return cms.getOrgs(JSON.parse(response)["student_id"])
+    }).then(function (docs){
+        //parses response from string to json
+        var resp = JSON.parse(docs);
+        resp.forEach(function(arr){
+            if(arr.entity_id == req.params.key){
+                var g = Group({
+                    name  : arr.name,
+                    desc  : arr.description,
+                    admin : req.session.cas_user
+                });
+                g.save(function (err, saved) {
+                    if (err) {
+                        return console.log('error saving to db');
+                    }else{
+                        console.log(arr.name);
+                    }
+                })
+                res.redirect('/auth');
+                return;
+            }
         });
+        res.redirect('/createGroup');
     });
 });
 
