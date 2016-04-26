@@ -15,45 +15,19 @@ var cms               = require('cms-api')(config.cms_api_token);
 
 // configuration ===========================================
 
-//cms
-cms.getRCS('villat2').then(function (response) {
-    console.log(response);
-});
+//cms test
+// cms.getRCS('villat2').then(function (response) {
+//     console.log(response);
+// });
 
 //connect to mongodb
 mongoose.connect('mongodb://localhost/elex');
 var Schema = mongoose.Schema, ObjectId = Schema.ObjectId;
 // mongodb schemas
-var user = new mongoose.Schema({
-  name : String,
-  ID   : ObjectId
-});
-var vote = new mongoose.Schema({
-  result      : String,
-  meeting     : Number,
-  user        : Number,
-  name        : String,
-  Description : String,
-  ID          : ObjectId
-});
-var meeting = new mongoose.Schema({
-  name  : String,
-  date  : Date,
-  pin   : Number,
-  group : Number,
-  ID    : ObjectId
-});
-var group = new mongoose.Schema({
-  name    : String,
-  desc    : String,
-  admin   : String,
-  allowed : Array,
-  ID      : ObjectId
-});
-var users    = mongoose.model('user', user);
-var votes    = mongoose.model('vote', vote);
-var meetings = mongoose.model('meetings', meeting);
-var groups   = mongoose.model('group', group);
+var User     = require('./app/models/user.model.js');
+var Vote     = require('./app/models/vote.model.js');
+var Meeting  = require('./app/models/meeting.model.js');
+var groups   = require('./app/models/group.model.js');
 
 //establish new session
 app.use( session({
@@ -90,10 +64,10 @@ io.on('connection', function (socket) {
             }
         })
     });
-	
+
 	//if user creates a meeting, add to the database
     socket.on('new meeting', function( info ){
-        var m = meetings({
+        var m = Meeting({
             name : info.name,
             pin : info.pin
         });
@@ -139,10 +113,10 @@ app.get('/auth', cas.bounce, function ( req, res ) {
     var rcsID = req.session.cas_user;
 
     //searches to see if rcsID is already in db
-    users.findOne({'name' : rcsID}, function(err, user){
+    User.findOne({'name' : rcsID}, function(err, user){
         if(err){ console.log(err); }
         else if(!user){
-            var u = new users({
+            var u = new User({
                 name : rcsID
             });
             u.save(function (err, saved) {
@@ -173,7 +147,7 @@ app.get('/api/newGroups', function (req, res) {
 });
 
 app.get('/api/meetings', function (req, res) {
-    meetings.find({}, function(err, docs){
+    Meeting.find({}, function(err, docs){
         res.json(docs);
     });
 });
@@ -234,7 +208,7 @@ app.get('/executeCreation/:key', cas.block, function (req, res) {
 app.get('/joinvote/:key', cas.bounce, function (req, res) {
     var rcsID = req.session.cas_user;
     groups.findOne({'ID' : req.param.key}, function(err, group){
-        users.findOne({'name' : rcsID}, function(err, user){
+        User.findOne({'name' : rcsID}, function(err, user){
             /*
 			if(group["admin"] == user["ID"]){
                 res.sendFile(__dirname + '/views/createPoll.html');
@@ -250,7 +224,7 @@ app.get('/joinvote/:key', cas.bounce, function (req, res) {
 app.get('/polls/:key', cas.bounce, function (req, res) {
     var rcsID = req.session.cas_user;
     groups.findOne({'ID' : req.param.key}, function(err, group){
-        users.findOne({'name' : rcsID}, function(err, user){
+        User.findOne({'name' : rcsID}, function(err, user){
             /*
 			if(group["admin"] == user["ID"]){
                 res.sendFile(__dirname + '/views/createPoll.html');
