@@ -48,8 +48,9 @@
 		$.get('/api/groups', function (response) {
 			$("#groups").empty();
 			response.forEach(function(arr){
-				$("#groups").html($("#groups").html() + "<form method=\"get\" action=\"/joinvote/" + arr._id + "\" class=\"col-md-4 text-center\"><button type=\"submit\" class=\"btn btn-danger btn-lg group-button\">" + arr.name +
-				"</button></form>");
+				var toAdd = $("<form>").attr('method', 'get').attr('action', '/meetings/' + arr._id).attr('class', 'col-md-4 text-center')
+				toAdd.append($("<button>").attr('type', 'submit').attr('class', 'btn btn-danger btn-lg group-button').text(arr.name));
+				$("#groups").append(toAdd);
 			});
 		});
     </script>

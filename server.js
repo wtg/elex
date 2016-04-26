@@ -155,22 +155,6 @@ app.get('/executeCreation/:key', cas.block, function (req, res) {
     });
 });
 
-app.get('/joinvote/:key', cas.bounce, function (req, res) {
-    var rcsID = req.session.cas_user;
-    Group.findOne({'ID' : req.param.key}, function(err, group){
-        User.findOne({'name' : rcsID}, function(err, user){
-            /*
-			if(group["admin"] == user["ID"]){
-                res.sendFile(__dirname + '/views/createPoll.html');
-            }else{
-                res.sendFile(__dirname + '/views/pin.html');
-            }
-			*/
-			res.sendFile(__dirname + '/views/meetings.html');
-        });
-    });
-});
-
 app.get('/polls/:key', cas.bounce, function (req, res) {
     var rcsID = req.session.cas_user;
     Group.findOne({'ID' : req.param.key}, function(err, group){
