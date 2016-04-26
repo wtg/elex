@@ -104,12 +104,6 @@ io.on('connection', function (socket) {
     });
 });
 
-app.get('/api/meetings', function (req, res) {
-    Meeting.find({}, function(err, docs){
-        res.json(docs);
-    });
-});
-
 app.get('/', function (req, res) {
     if (!req.session[cas.session_name]) {
         res.sendFile(__dirname + '/views/index.html');
@@ -208,6 +202,7 @@ app.post('/vote', cas.block, function ( req, res ) {
 require('./app/routes')(app); // configure our routes
 require('./app/routes/user.routes')(app, cas);
 require('./app/routes/group.routes')(app, cas);
+require('./app/routes/meeting.routes')(app, cas);
 
 // start app ===============================================
 server.listen(port, function(){
