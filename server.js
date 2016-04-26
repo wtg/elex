@@ -50,7 +50,7 @@ app.use(express.static('public'));
 var User     = require('./app/models/user.model.js');
 var Vote     = require('./app/models/vote.model.js');
 var Meeting  = require('./app/models/meeting.model.js');
-var Group   = require('./app/models/group.model.js');
+var Group    = require('./app/models/group.model.js');
 
 //establish new session
 app.use(session({
