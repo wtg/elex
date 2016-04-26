@@ -25,35 +25,35 @@ mongoose.connect('mongodb://localhost/elex');
 var Schema = mongoose.Schema, ObjectId = Schema.ObjectId;
 // mongodb schemas
 var user = new mongoose.Schema({
-  name: String,
-  ID: ObjectId
+  name : String,
+  ID   : ObjectId
 });
 var vote = new mongoose.Schema({
-  result: String,
-  meeting: Number,
-  user: Number,
-  name: String,
-  Description: String,
-  ID: ObjectId
+  result      : String,
+  meeting     : Number,
+  user        : Number,
+  name        : String,
+  Description : String,
+  ID          : ObjectId
 });
 var meeting = new mongoose.Schema({
-  name: String,
-  date: Date,
-  pin: Number,
-  group: Number,
-  ID: ObjectId
+  name  : String,
+  date  : Date,
+  pin   : Number,
+  group : Number,
+  ID    : ObjectId
 });
 var group = new mongoose.Schema({
-  name: String,
-  desc: String,
-  admin: Number,
-  allowed: Array,
-  ID: ObjectId
+  name    : String,
+  desc    : String,
+  admin   : String,
+  allowed : Array,
+  ID      : ObjectId
 });
-var users = mongoose.model('user', user);
-var votes = mongoose.model('vote', vote);
+var users    = mongoose.model('user', user);
+var votes    = mongoose.model('vote', vote);
 var meetings = mongoose.model('meetings', meeting);
-var groups = mongoose.model('group', group);
+var groups   = mongoose.model('group', group);
 
 //establish new session
 app.use( session({
@@ -152,8 +152,6 @@ app.get('/auth', cas.bounce, function ( req, res ) {
                     console.log("please?");
                 }
             })
-
-
         }
 
         res.sendFile(__dirname + '/views/main_menu.html');
@@ -202,21 +200,34 @@ app.get('/createPoll', cas.block, function (req, res) {
     res.sendFile(__dirname + '/views/createPoll.html')
 });
 
-app.post('/executeCreation', cas.block, function (req, res) {
-    if(!req.body || !req.body.name || !req.body.desc) {
-        res.redirect('/creategroup');
-        return;
-    }
-
-
-    users.findOne({'name' : req.session.cas_user}, function(err, user){
-        var group = new groups({
-            name: req.body.name,
-            desc: req.body.desc,
-            admin: user["ID"]
+app.get('/executeCreation/:key', cas.block, function (req, res) {
+    //change "etzinj" to "req.session.cas_user"
+    //gets user's rin
+    cms.getRCS("etzinj").then(function (response) {
+        //gets user's clubs
+        cms.getOrgs(JSON.parse(response)["student_id"]).then(function (docs){
+            //parses response from string to json
+            var resp = JSON.parse(docs);
+            resp.forEach(function(arr){
+                if(arr.entity_id == req.params.key){
+                    var g = groups({
+                        name  : arr.name,
+                        desc  : arr.description,
+                        admin : req.session.cas_user
+                    });
+                    g.save(function (err, saved) {
+                        if (err) {
+                            return console.log('error saving to db');
+                        }else{
+                            console.log(arr.name);
+                        }
+                    })
+                    res.redirect('/auth');
+                    return;
+                }
+            });
+            res.redirect('/createGroup');
         });
-
-        res.redirect('/auth');
     });
 });
 
