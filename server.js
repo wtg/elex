@@ -60,8 +60,10 @@ app.use(session({
 }));
 
 var cas = new CASAuthentication({
-    cas_url      : 'https://cas-auth.rpi.edu/cas',
-    service_url  : 'http://localhost:3000/auth?'
+    cas_url       : 'https://cas-auth.rpi.edu/cas',
+    service_url   : 'http://localhost:3000/auth?',
+    is_dev_mode   : true,
+    dev_mode_user : 'etzinj'
 });
 
 io.on('connection', function (socket) {
