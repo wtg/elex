@@ -11,7 +11,7 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-xs-12">
-				<h1 class="text-center header" id="groupHeader">Meetings</h1>
+				<h1 class="text-center header" id="groupHeader"></h1>
 			</div>
 		</div>
 
@@ -44,12 +44,13 @@
     <script>
 		$.get('/api/groups/' + window.location.href.split('/').pop(), function (response) {
 			$('#groupHeader').text(response.name);
-		})
-
-		$.get('/api/meetings/' + window.location.href.split('/').pop(), function (response) {
+		});
+	
+		$.get('/api/meetings/' , function (response) {			
 			response.forEach(function(arr){
-				$("#meetings").html($("#meetings").html() + "<form method=\"get\" action=\"/polls/" + arr._id + "\" class=\"col-md-4 text-center\"><button type=\"submit\" class=\"btn btn-danger btn-lg group-button\">" + arr.name +
-				"</button></form>");
+				var toAdd = $("<form>").attr('method', 'get').attr('action', '/polls/' + arr._id).attr('class', 'col-md-4 text-center');
+				toAdd.append($("<button>").attr('type', 'submit').attr('class', 'btn btn-danger btn-lg group-button').text(arr.name));
+				$("#meetings").append(toAdd);
 			});
 		});
     </script>
