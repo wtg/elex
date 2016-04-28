@@ -118,6 +118,10 @@ app.get('/creategroup', cas.block, function (req, res) {
     res.sendFile(__dirname + '/views/createGroup.html')
 });
 
+app.get('/vote', cas.block, function (req, res) {
+    res.sendFile(__dirname + '/views/vote.html')
+});
+
 app.get('/createMeeting', cas.block, function (req, res) {
     res.sendFile(__dirname + '/views/createMeeting.html')
 });
