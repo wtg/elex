@@ -32,23 +32,7 @@ module.exports = function(app, cas) {
 
             resp.forEach(function(arr) {
                 Group.findOne({ casEntity: arr.entity_id }).then(function (group) {
-                    if (!group) {
-                        var g = Group({
-                            name      : arr.name,
-                            desc      : arr.description,
-                            admin     : null,
-                            casEntity : arr.entity_id,
-                            allowed   : [user]
-                        });
-
-                        g.save(function (err, saved) {
-                            if (err) {
-                                console.err(err);
-                            }
-                        });
-                    } else {
-                        console.log(group);
-
+                    if(group) {
                         if(group.allowed.indexOf(user) === -1) {
                             group.allowed.push(user);
                         }
@@ -96,7 +80,7 @@ module.exports = function(app, cas) {
                             group.allowed.push(user);
                         }
 
-                        Group.update({ _id : group._id }, { allowed: group.allowed }).then(function (data) {
+                        Group.update({ _id : group._id }, { admin: group.admin, allowed: group.allowed }).then(function (data) {
                             numProcessed++;
                             if(numProcessed === resp.length) {
                                 Group.find({ $or: [{allowed: user}, {admin: user}] }, function (err, groups) {
