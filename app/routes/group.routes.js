@@ -9,7 +9,7 @@ module.exports = function(app, cas) {
             res.redirect('/auth');
             return;
         }
-        
+
         res.sendFile(path.resolve('views/main_menu.html'));
     });
 
@@ -22,8 +22,45 @@ module.exports = function(app, cas) {
         }
 
         var user = req.session.cas_user.toLowerCase();
+        var rin = '';
         cms.getRCS(user).then(function (response) {
-            return cms.getOrgs(JSON.parse(response)["student_id"]);
+            rin = JSON.parse(response)["student_id"];
+            return cms.getAllOrgs(rin);
+        }).then(function (docs) {
+            var numProcessed = 0; // this ensures the data isn't returned until we're done
+            var resp = JSON.parse(docs);
+
+            resp.forEach(function(arr) {
+                Group.findOne({ casEntity: arr.entity_id }).then(function (group) {
+                    if (!group) {
+                        var g = Group({
+                            name      : arr.name,
+                            desc      : arr.description,
+                            admin     : null,
+                            casEntity : arr.entity_id,
+                            allowed   : [user]
+                        });
+
+                        g.save(function (err, saved) {
+                            if (err) {
+                                console.err(err);
+                            }
+                        });
+                    } else {
+                        console.log(group);
+
+                        if(group.allowed.indexOf(user) === -1) {
+                            group.allowed.push(user);
+                        }
+
+                        Group.update({ _id : group._id }, { allowed: group.allowed });
+                    }
+                }, function (err) {
+                    throw err;
+                });
+            });
+
+            return cms.getOrgs(rin);
         }).then(function (docs){
             var numProcessed = 0; // this ensures the data isn't returned until we're done
             var resp = JSON.parse(docs);
@@ -51,12 +88,22 @@ module.exports = function(app, cas) {
                             }
                         });
                     } else {
-                        numProcessed++;
-                        if(numProcessed === resp.length) {
-                            Group.find({ $or: [{allowed: user}, {admin: user}] }, function (err, groups) {
-                                res.json(groups);
-                            });
+                        if(!group.admin) {
+                            group.admin = user;
                         }
+
+                        if(group.allowed.indexOf(user) === -1) {
+                            group.allowed.push(user);
+                        }
+
+                        Group.update({ _id : group._id }, { allowed: group.allowed }).then(function (data) {
+                            numProcessed++;
+                            if(numProcessed === resp.length) {
+                                Group.find({ $or: [{allowed: user}, {admin: user}] }, function (err, groups) {
+                                    res.json(groups);
+                                });
+                            }
+                        })
                     }
                 }, function (err) {
                     throw err;
