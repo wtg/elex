@@ -14,17 +14,18 @@
 				<h1 class="text-center header">Create a New Meeting</h1>
 			</div>
 		</div>
-		
+
 		<div class="row vote-buttons">
 			<div class="col-md-16">
-				<form method="get" action="main_menu.html">
-				<label for="name" class="vote-details">Meeting Name:</label>
-				<input type="text" class="form-control" id="name"/>
-				<label for="pin" class="vote-details">PIN:</label>
-				<input type="text" class="form-control" id="pin"/>
-				<button type="submit" class="btn btn-success btn-lg group-button text-center" id="submit">
-					Submit
-				</button>
+				<form method="post" action="/api/meetings">
+					<label for="name" class="vote-details">Meeting Name:</label>
+					<input type="text" class="form-control" id="name" name="name"/>
+					<label for="pin" class="vote-details">PIN:</label>
+					<input type="text" class="form-control" id="pin" name="pin"/>
+					<input type="hidden" id="group" name="group" />
+					<button type="submit" class="btn btn-success btn-lg group-button text-center" id="submit">
+						Submit
+					</button>
 				</form>
 				<form method="get" action="/">
 				<button type="submit" class="btn btn-danger btn-lg group-button text-center">
@@ -33,7 +34,7 @@
 				</form>
 			</div>
 		</div>
-		
+
 		<div class="row">
 			<div class="col-xs-12">
 				<h2 class="text-center user-details">
@@ -51,14 +52,16 @@
     crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-		var socket = io.connect('http://localhost:3000');
-		$("#submit").click(function(){
-			socket.emit('new meeting', {name : $("#name").val(), pin : $("#pin").val()});
-		});
-		socket.on('socket_req', function (data) {
-//        console.log(data);
-        socket.emit('my other event', { my: 'data' });
-		});
+			$(document).ready(function () {
+				var group_id = window.location.href.split('/').pop();
+
+				// remove any trailing '?'s
+				if(group_id[group_id.length - 1] === '?') {
+					group_id = group_id.slice(0, -1);
+				}
+
+				$('#group').val(group_id)
+			});
     </script>
 </body>
 </html>

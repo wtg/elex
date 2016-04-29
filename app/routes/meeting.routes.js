@@ -45,4 +45,29 @@ module.exports = function(app, cas) {
             res.json(docs);
         });
     });
+
+    app.post('/api/meetings', function (req, res) {
+        var info = req.body;
+
+        var m = Meeting({
+            name : info.name,
+            pin : info.pin,
+            group : info.group
+        });
+        m.save(function (err, saved) {
+            if (err) {
+                return console.error(err);
+            }else{
+                res.redirect('/meetings/' + info.group);
+            }
+        })
+    });
+
+    app.get('/createMeeting/:id', function (req, res) {
+        if(!req.session.cas_user) {
+            res.redirect('/auth');
+        }
+
+        res.sendFile(path.resolve('views/createMeeting.html'));
+    });
 }

@@ -122,10 +122,6 @@ app.get('/vote', cas.block, function (req, res) {
     res.sendFile(__dirname + '/views/vote.html')
 });
 
-app.get('/createMeeting', cas.block, function (req, res) {
-    res.sendFile(__dirname + '/views/createMeeting.html')
-});
-
 app.get('/createPoll', cas.block, function (req, res) {
     res.sendFile(__dirname + '/views/createPoll.html')
 });

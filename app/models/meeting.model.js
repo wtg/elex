@@ -6,6 +6,6 @@ module.exports = mongoose.model('Meeting', {
   name  : String,
   date  : Date,
   pin   : Number,
-  group : Number,
+  group : String,
   ID    : mongoose.Schema.ObjectId
 });

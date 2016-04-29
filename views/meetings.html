@@ -16,11 +16,15 @@
 		</div>
 
 		<div class="row">
-			<form method="get" action="/createmeeting" class="col-md-16 text-center">
-				<button type="submit" class="btn btn-primary btn-lg group-button">
+			<form method="get" id="createBtnForm">
+				<button class="btn btn-primary btn-lg group-button">
 					Create Meeting
 				</button>
 			</form>
+		</div>
+		<div class="row">
+
+
 		</div>
 
 		<div class="row vote-buttons" id="meetings"></div>
@@ -42,11 +46,20 @@
     crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-		$.get('/api/groups/' + window.location.href.split('/').pop(), function (response) {
+		var group_id = window.location.href.split('/').pop();
+
+		// remove any trailing '?'s
+		if(group_id[group_id.length - 1] === '?') {
+			group_id = group_id.slice(0, -1);
+		}
+
+		$('#createBtnForm').attr('action', '/createmeeting/' + group_id);
+
+		$.get('/api/groups/' + group_id, function (response) {
 			$('#groupHeader').text(response.name);
 		});
-	
-		$.get('/api/meetings/' , function (response) {			
+
+		$.get('/api/meetings/' + group_id, function (response) {
 			response.forEach(function(arr){
 				var toAdd = $("<form>").attr('method', 'get').attr('action', '/polls/' + arr._id).attr('class', 'col-md-4 text-center');
 				toAdd.append($("<button>").attr('type', 'submit').attr('class', 'btn btn-danger btn-lg group-button').text(arr.name));
