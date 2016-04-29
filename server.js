@@ -6,7 +6,6 @@ var app               = express();
 var server            = require('http').Server(app);
 var bodyParser        = require('body-parser');
 var methodOverride    = require('method-override');
-var io                = require('socket.io')(server);
 var session           = require('express-session');
 var CASAuthentication = require('cas-authentication');
 var mongoose          = require('mongoose');
@@ -64,14 +63,6 @@ var cas = new CASAuthentication({
     service_url   : 'http://localhost:3000/auth?',
     is_dev_mode   : true,
     dev_mode_user : 'etzinj'
-});
-
-io.on('connection', function (socket) {
-    //console.log(socket.request.client);
-    // socket.emit('socket_req', socket.request.client);
-    socket.on('my other event', function (data) {
-        console.log(data.session[cas.session_name]);
-    });
 });
 
 app.get('/', function (req, res) {
@@ -153,10 +144,11 @@ app.post('/vote', cas.block, function ( req, res ) {
 });
 
 // routes ==================================================
-require('./app/routes')(app); // configure our routes
+require('./app/routes')(app);
 require('./app/routes/user.routes')(app, cas);
 require('./app/routes/group.routes')(app, cas);
 require('./app/routes/meeting.routes')(app, cas);
+require('./app/routes/poll.routes')(server);
 
 // start app ===============================================
 server.listen(port, function(){
