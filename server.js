@@ -72,36 +72,6 @@ io.on('connection', function (socket) {
     socket.on('my other event', function (data) {
         console.log(data.session[cas.session_name]);
     });
-
-    //if user creates a group, add to the database
-    socket.on('new group', function( info ){
-        var g = Group({
-            name : info.name,
-            desc : info.desc
-        });
-        g.save(function (err, saved) {
-            if (err) {
-                return console.log('error saving to db');
-            }else{
-                console.log(info.desc);
-            }
-        })
-    });
-
-	//if user creates a meeting, add to the database
-    socket.on('new meeting', function( info ){
-        var m = Meeting({
-            name : info.name,
-            pin : info.pin
-        });
-        m.save(function (err, saved) {
-            if (err) {
-                return console.log('error saving to db');
-            }else{
-                console.log(info.name);
-            }
-        })
-    });
 });
 
 app.get('/', function (req, res) {
