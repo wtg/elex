@@ -32,7 +32,15 @@ module.exports = function(app, cas) {
 
             resp.forEach(function(arr) {
                 Group.findOne({ casEntity: arr.entity_id }).then(function (group) {
-                    if(group) {
+                    if(!group) {
+                        Group({
+                            name      : arr.name,
+                            desc      : arr.description,
+                            admin     : null,
+                            casEntity : arr.entity_id,
+                            allowed   : [user]
+                        }).save();
+                    } else {
                         if(group.allowed.indexOf(user) === -1) {
                             group.allowed.push(user);
                         }
