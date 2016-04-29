@@ -47,8 +47,17 @@
     <script>
 		$.get('/api/groups', function (response) {
 			$("#groups").empty();
-			response.forEach(function(arr){
-				var toAdd = $("<form>").attr('method', 'get').attr('action', '/meetings/' + arr._id).attr('class', 'col-md-4 text-center')
+			response.forEach(function(arr, index){
+				var toAdd = $("<form>").attr('method', 'get').attr('action', '/meetings/' + arr._id);
+
+				if(response.length % 3 === 2 && index === response.length - 2) {
+					toAdd.attr('class', 'col-md-offset-2 col-md-4 text-center');
+				} else if(response.length % 3 === 1 && index === response.length - 1) {
+					toAdd.attr('class', 'col-md-offset-4 col-md-4 text-center');
+				} else {
+					toAdd.attr('class', 'col-md-4 text-center');
+				}
+
 				toAdd.append($("<button>").attr('type', 'submit').attr('class', 'btn btn-danger btn-lg group-button').text(arr.name));
 				$("#groups").append(toAdd);
 			});
