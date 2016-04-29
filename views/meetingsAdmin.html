@@ -16,6 +16,13 @@
 		</div>
 
 		<div class="row">
+			<form method="get" id="createBtnForm">
+				<button class="btn btn-primary btn-lg group-button">
+					Create Meeting
+				</button>
+			</form>
+		</div>
+		<div class="row">
 
 
 		</div>
@@ -45,6 +52,8 @@
 		if(group_id[group_id.length - 1] === '?') {
 			group_id = group_id.slice(0, -1);
 		}
+
+		$('#createBtnForm').attr('action', '/createmeeting/' + group_id);
 
 		$.get('/api/groups/' + group_id, function (response) {
 			$('#groupHeader').text(response.name);
