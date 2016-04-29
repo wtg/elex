@@ -17,7 +17,7 @@
 
 		<div class="row vote-buttons">
 			<div class="col-md-16">
-				<form method="post" id="myform" action="/executeCreation">
+				<form id="myform">
 					<label for="name" class="vote-details">Poll Name:</label>
 					<input type="text" class="form-control" name="name" id="name"/>
 
@@ -82,12 +82,12 @@
 		
 		var socket = io.connect('http://localhost:3000');
 		$("#submit").click(function(){
-			socket.emit('new group', {name : $("#name").val(), desc : $("#desc").val()});
+			socket.emit('create vote', {name : $("#name").val(), desc : $("#desc").val()});
 		});
-		socket.on('socket_req', function (data) {
-//        console.log(data);
-        socket.emit('my other event', { my: 'data' });
-		});
+		
+//        socket.on('socket_req', function (data) {
+//            socket.emit('my other event', { my: 'data' });
+//		});
     </script>
 </body>
 </html>

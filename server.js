@@ -47,7 +47,7 @@ app.use(express.static('public'));
 
 // mongodb schemas
 var User     = require('./app/models/user.model.js');
-var Vote     = require('./app/models/vote.model.js');
+var Poll     = require('./app/models/poll.model.js');
 var Meeting  = require('./app/models/meeting.model.js');
 var Group    = require('./app/models/group.model.js');
 
@@ -63,6 +63,7 @@ var cas = new CASAuthentication({
     service_url   : 'http://localhost:3000/auth?',
     is_dev_mode   : true,
     dev_mode_user : 'etzinj'
+//    dev_mode_user : 'chens16'
 });
 
 app.get('/', function (req, res) {

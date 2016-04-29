@@ -18,9 +18,9 @@
             </div>
             <div class="row vote-buttons">
                 <div ng-repeat="value in poll_values" class="col-md-4 text-center">
-                    <button class="btn btn-default btn-lg vote-button">
-                    <i class="fa fa-thumbs-up"></i>
-                    {{value}}
+                    <button class="btn btn-default btn-lg vote-button" ng-click = "vote(value)">
+                        <i class="fa fa-thumbs-up"></i>
+                        {{value}}
                     </button>
                 </div>
             </div>
@@ -59,13 +59,27 @@
             $scope.clubname = "46th Student Senate";
             $scope.user_name = "Richard Plotka";
             $scope.username = "plotkr2"; 
-        });
+            $scope.meeting_id = "somerandomid"; 
+            $scope.poll_id = "somerandomid"; 
         
-		var socket = io.connect('http://localhost:3000');
-		socket.on('socket_req', function (data) {
-//        console.log(data);
-//        socket.emit('my other event', { my: 'data' });
-      });
+
+            var socket = io.connect('http://localhost:3000');
+//            var socket2 = io2.connect('http://localhost:3000');
+            socket.on('enter vote', function (data) {
+                $scope.user_name = data["user_name"];    
+                $scope.username = data["username"];    
+                $scope.clubname = data["clubname"];    
+                $scope.meeting_date = data["meeting_date"];    
+                $scope.motion_numb = data["motion_num"];    
+                $scope.meeting_id = data["meeting_id"];    
+                $scope.poll_id = data["poll_id"];    
+            });
+            
+            $scope.vote = function(val){
+                socket.emit('submit vote', {vote: String(val), pid: $scope.poll_id, mid: $scope.meeting_id}, voter: $scope.username);
+            }
+        
+        });
     </script>
 </body>
 </html>
