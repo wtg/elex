@@ -84,10 +84,6 @@ app.get('/vote', cas.block, function (req, res) {
     res.sendFile(__dirname + '/views/vote.html')
 });
 
-app.get('/createPoll', cas.block, function (req, res) {
-    res.sendFile(__dirname + '/views/createPoll.html')
-});
-
 app.get('/executeCreation/:key', cas.block, function (req, res) {
     //change "etzinj" to "req.session.cas_user"
     //gets user's rin
@@ -120,22 +116,6 @@ app.get('/executeCreation/:key', cas.block, function (req, res) {
     });
 });
 
-app.get('/polls/:key', cas.bounce, function (req, res) {
-    var rcsID = req.session.cas_user;
-    Group.findOne({'ID' : req.param.key}, function(err, group){
-        User.findOne({'name' : rcsID}, function(err, user){
-            /*
-			if(group["admin"] == user["ID"]){
-                res.sendFile(__dirname + '/views/createPoll.html');
-            }else{
-                res.sendFile(__dirname + '/views/pin.html');
-            }
-			*/
-			res.sendFile(__dirname + '/views/polls.html');
-        });
-    });
-});
-
 app.post('/vote', cas.block, function ( req, res ) {
     if (!req.body.pin) {
         res.redirect('/joinvote')
@@ -150,7 +130,7 @@ require('./app/routes')(app);
 require('./app/routes/user.routes')(app, cas);
 require('./app/routes/group.routes')(app, cas);
 require('./app/routes/meeting.routes')(app, cas);
-require('./app/routes/poll.routes')(server);
+require('./app/routes/poll.routes')(app, cas, server);
 
 // start app ===============================================
 server.listen(port, function(){

@@ -1,7 +1,12 @@
+var path        = require('path');
+var config      = require('../../config.js');
+var cms         = require('cms-api')(config.cms_api_token);
 var socketIO    = require('socket.io');
 var Meeting     = require('../models/meeting.model.js');
 var Poll        = require('../models/poll.model.js');
 var Participant = require('../models/participant.model.js');
+var Group       = require('../models/group.model.js');
+var User        = require('../models/user.model.js');
 
 /**
  * Emits the details of an active vote to the client. Used when a vote is created
@@ -22,7 +27,7 @@ function emitPollActive(socket, meeting, poll) {
     });
 }
 
-module.exports = function (server) {
+module.exports = function (app, cas, server) {
     var io = socketIO(server);
 
     io.on('connection', function (socket) {
@@ -161,4 +166,23 @@ module.exports = function (server) {
             });
         });
     });
+
+	app.get('/createPoll/:key', cas.block, function (req, res) {
+	    res.sendFile(path.resolve('/views/createPoll.html'));
+	});
+
+	app.get('/polls/:key', cas.bounce, function (req, res) {
+	    var rcsID = req.session.cas_user.toLowerCase();
+
+    	Meeting.findOne({"_id" : req.params.key}, function(err, meet){
+			console.log("meet: ");
+    		Group.findOne({"_id" : meet.group}, function(err, group){
+    			if(group.admin == rcsID){
+    				res.sendFile(path.resolve('views/polls.html'));
+    			}else{
+    				res.sendFile(path.resolve('views/pin.html'));
+    			}
+    		});
+    	});
+	});
 }

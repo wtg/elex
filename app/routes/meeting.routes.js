@@ -15,7 +15,7 @@ module.exports = function(app, cas) {
 
     app.get('/meetings/:key', cas.bounce, function (req, res) {console.log("3");
         var rcsID = req.session.cas_user.toLowerCase();
-        Group.findOne({"_id" : req.params.key}, function(err, group){
+        Group.findOne({_id : req.params.key}, function(err, group){
 			console.log(group.admin+"admin");
 			if(group["admin"] == rcsID){
 				console.log(rcsID);
@@ -43,7 +43,7 @@ module.exports = function(app, cas) {
             res.json(docs);
         });
     });
-    
+
     app.post('/api/meetings', function (req, res) {
         var info = req.body;
 
