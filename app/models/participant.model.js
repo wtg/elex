@@ -6,5 +6,5 @@ module.exports = mongoose.model('Participant', {
   clientSocketID : String,
   meetingID      : String,
   username       : String,
-  ID             : ObjectId
+  ID             : mongoose.Schema.ObjectId
 });

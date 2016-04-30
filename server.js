@@ -76,10 +76,6 @@ app.get('/', function (req, res) {
 
 app.get('/logout', cas.logout);
 
-app.get('/creategroup', cas.block, function (req, res) {
-    res.sendFile(__dirname + '/views/createGroup.html')
-});
-
 app.get('/vote', cas.block, function (req, res) {
     res.sendFile(__dirname + '/views/vote.html')
 });

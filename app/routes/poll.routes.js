@@ -2,6 +2,7 @@ var path        = require('path');
 var config      = require('../../config.js');
 var cms         = require('cms-api')(config.cms_api_token);
 var socketIO    = require('socket.io');
+var path        = require('path');
 var Meeting     = require('../models/meeting.model.js');
 var Poll        = require('../models/poll.model.js');
 var Participant = require('../models/participant.model.js');
@@ -168,7 +169,7 @@ module.exports = function (app, cas, server) {
     });
 
 	app.get('/createPoll/:key', cas.block, function (req, res) {
-	    res.sendFile(path.resolve('/views/createPoll.html'));
+	    res.sendFile(path.resolve('views/createPoll.html'));
 	});
 
 	app.get('/polls/:key', cas.bounce, function (req, res) {

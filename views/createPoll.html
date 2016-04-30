@@ -9,7 +9,7 @@
 
 <body style="background-color: rgb(33,37,46)">
 	<div class="container" ng-app="poll" ng-controller="poll_ctrl">
-		
+
         <div ng-show="create_poll">
             <div class="row">
                 <div class="col-xs-12">
@@ -19,45 +19,41 @@
 
             <div class="row vote-buttons">
                 <div class="col-md-16">
-                    <form id="myform">
-                        <label for="name" class="vote-details">Poll Name:</label>
-                        <input type="text" class="form-control" name="name" id="name" ng-model="poll_name"/>
+                    <label for="name" class="vote-details">Poll Name:</label>
+                    <input type="text" class="form-control" name="name" id="name" ng-model="poll_name"/>
 
-                        <label for="desc" class="vote-details">Description:</label>
-                        <textarea type="text" rows="5" class="form-control" name="desc" id="desc" ng-model="poll_description"></textarea>
+                    <label for="desc" class="vote-details">Description:</label>
+                    <textarea type="text" rows="5" class="form-control" name="desc" id="desc" ng-model="poll_description"></textarea>
 
-                        <label for="options" class="vote-details">Poll Options:</label>
+                    <label for="options" class="vote-details">Poll Options:</label>
 
-                        <div class="row">
-                            <div class="col-md-4">
-                                 <input id="newOption" type="text" class="form-control" placeholder="+  New option" ng-model="newOption" type="text">
-                            </div>
-                            <button ng-click="add(newOption)" class="btn-default btn-sm">Add</button>
-
-
+                    <div class="row">
+                        <div class="col-md-4">
+                             <input id="newOption" type="text" class="form-control" placeholder="+  New option" ng-model="newOption" type="text">
                         </div>
-                        <ul id="options">
-                            <li ng-repeat="i in poll_options" class="user-details" ng-click="remove($index)">{{i}}</li>
-                        </ul>
+                        <button ng-click="add(newOption)" class="btn-default btn-sm">Add</button>
 
-                        <button type="submit" class="btn btn-success btn-lg group-button text-center" id="submit" ng-click="submit()">
-                            Submit
-                        </button>
-                    </form>
-                    <form method="get" action="/">
+
+                    </div>
+                    <ul id="options">
+                        <li ng-repeat="i in poll_options" class="user-details" ng-click="remove($index)">{{i}}</li>
+                    </ul>
+
+                    <button class="btn btn-success btn-lg group-button text-center" id="submit" ng-click="submit()">
+                        Submit
+                    </button>
                     <button type="submit" class="btn btn-danger btn-lg group-button text-center">
                         Cancel
                     </button>
-                    </form>
                 </div>
             </div>
         </div>
-        
+
         <div ng-show="!create_poll">
-            
+
             <button ng-click="show_create()" class="btn btn-primary">Create Poll</button>
         </div>
-        
+
          <div class="row">
             <div class="col-xs-12">
                 <h2 class="text-center user-details">
@@ -69,15 +65,15 @@
             </div>
         </div>
     </div>
-    
-    
+
+
 
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
     integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
     crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
-    
+
     <script>
         var meeting_id = window.location.href.split('/').pop();
 
@@ -86,7 +82,7 @@
             meeting_id = meeting_id.slice(0, -1);
         }
 
-        
+
         var app = angular.module("poll",[]);
         app.controller("poll_ctrl",function($scope,$http){
             var socket = io.connect('http://localhost:3000');
@@ -95,7 +91,7 @@
             $scope.poll_options = [];
             $scope.username = "";
             $scope.create_poll = false;
- 
+
             $http.get('/api/getuser').then(function (response) {
                 if(response.data.is_authenticated) {
                     $scope.username = response.data.user;
@@ -103,34 +99,34 @@
                     console.log($scope.username + " joined meeting");
                 }
             })
-            
+
             $scope.add = function(item) {
-                
+
                 if(($scope.poll_options).indexOf(item) > -1){
-//                      alert("already contains") 
+//                      alert("already contains")
                 }
                 else {
                     $scope.poll_options.push(item);
                     $scope.newOption = "";
                 }
             };
-            
+
             $scope.remove = function(index) {
                 $scope.poll_options.splice(index, 1);
-            }; 
-            
+            };
+
             socket.on("invalid")
-            
-            
-            $scope.show_create = function(){
-                $scope.create_poll = true;
+
+
+            $scope.toggle_create = function(){
+                $scope.create_poll = !$scope.create_poll;
             }
-            
-            
+
+
             $scope.submit = function(){
                 socket.emit("create poll", {name: $scope.poll_name, description: $scope.poll_description, options: $scope.poll_options, username: $scope.username});
             }
-            
+
         });
     </script>
 </body>

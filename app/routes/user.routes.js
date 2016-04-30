@@ -29,8 +29,8 @@ module.exports = function(app, cas) {
 
     app.get('/api/getuser', function (req, res) {
         res.json({
-            is_authenticated: cas.session.cas_user ? true : false,
-            user: cas.session.cas_user ? cas.session.cas_user.toLowerCase() : null
+            is_authenticated: req.session.cas_user ? true : false,
+            user: req.session.cas_user ? req.session.cas_user.toLowerCase() : null
         })
     })
 }
