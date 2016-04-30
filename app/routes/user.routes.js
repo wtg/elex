@@ -8,7 +8,7 @@ module.exports = function(app, cas) {
         var rcsID = req.session.cas_user;
 
         //searches to see if rcsID is already in db
-        User.findOne({'name' : rcsID}, function(err, user){
+        User.findOne({'name' : rcsID}, function(err, user) {
             if(err){ console.log(err); }
             else if(!user){
                 var u = new User({
@@ -17,7 +17,7 @@ module.exports = function(app, cas) {
                 u.save(function (err, saved) {
                     if (err) {
                         return console.log('error saving to db');
-                    }else{
+                    } else {
                         console.log("please?");
                     }
                 })
@@ -26,4 +26,11 @@ module.exports = function(app, cas) {
             res.redirect('/groups');
         });
     });
+
+    app.get('/api/getuser', function (req, res) {
+        res.json({
+            is_authenticated: cas.session.cas_user ? true : false,
+            user: cas.session.cas_user ? cas.session.cas_user.toLowerCase() : null
+        })
+    })
 }
