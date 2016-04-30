@@ -13,17 +13,17 @@ module.exports = function(app, cas) {
         res.redirect('/groups');
     });
 
-    app.get('/meetings/:key', cas.bounce, function (req, res) {
-        var rcsID = req.session.cas_user.toLowerCase;
-        var rcsID = "etzinj";
-        User.findOne({'name' : rcsID}, function(err, user) {
-            Group.findOne({"_id" : req.params.key}, function(err, group){
-    			if(group["admin"] == user["ID"]){
-                    res.sendFile(path.resolve('views/meetingsAdmin.html'));
-                }else{
-                    res.sendFile(path.resolve('views/meetings.html'));
-                }
-            });
+    app.get('/meetings/:key', cas.bounce, function (req, res) {console.log("3");
+        var rcsID = req.session.cas_user.toLowerCase();
+        Group.findOne({"_id" : req.params.key}, function(err, group){
+			console.log(group.admin+"admin");
+			if(group["admin"] == rcsID){
+				console.log(rcsID);
+                res.sendFile(path.resolve('views/meetingsAdmin.html'));
+            }else{
+				console.log(rcsID+"member");
+                res.sendFile(path.resolve('views/meetings.html'));
+            }
         });
     });
 
@@ -42,5 +42,30 @@ module.exports = function(app, cas) {
         Meeting.find({ group: req.params.group_id }, function(err, docs){
             res.json(docs);
         });
+    });
+    
+    app.post('/api/meetings', function (req, res) {
+        var info = req.body;
+
+        var m = Meeting({
+            name : info.name,
+            pin : info.pin,
+            group : info.group
+        });
+        m.save(function (err, saved) {
+            if (err) {
+                return console.error(err);
+            }else{
+                res.redirect('/meetings/' + info.group);
+            }
+        })
+    });
+
+    app.get('/createMeeting/:id', function (req, res) {
+        if(!req.session.cas_user) {
+            res.redirect('/auth');
+        }
+
+        res.sendFile(path.resolve('views/createMeeting.html'));
     });
 }
