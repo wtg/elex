@@ -13,7 +13,7 @@
             <div class="row">
                 <div class="col-xs-12">
                     <h1 class="text-center header">General Body Meeting: {{meeting_date}}</h1>
-                    <h2 class="text-center vote-details">You are voting on: Motion {{motion_num}}</h2>
+                    <h2 class="text-center vote-details">You are voting on: {{poll_name}}</h2>
                 </div>
             </div>
             <div class="row vote-buttons">
@@ -31,7 +31,7 @@
                     {{clubname}}
                     </h2>
                     <h2 class="text-center user-details">
-                    Signed in as {{user_name}} ({{username}})
+                    Signed in as ({{username}})
                     </h2>
                 </div>
             </div>
@@ -51,32 +51,58 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
     
     <script>
+        var meeting_id = window.location.href.split('/').pop();
+
+        // remove any trailing '?'s
+        if(meeting_id[meeting_id.length - 1] === '?') {
+            meeting_id = meeting_id.slice(0, -1);
+        }
+
+        
         var app = angular.module("vote",[]);
-        app.controller("vote_ctrl",function($scope){
-            $scope.motion_num = 2;
+        app.controller("vote_ctrl",function($scope,$http){
             $scope.meeting_date = "Jan. 27";
             $scope.poll_values = ["yes","no","abstain"];
             $scope.clubname = "46th Student Senate";
-            $scope.user_name = "Richard Plotka";
+//            $scope.user_name = "Richard Plotka";
             $scope.username = "plotkr2"; 
-            $scope.meeting_id = "somerandomid"; 
             $scope.poll_id = "somerandomid"; 
-        
-
+            $scope.poll_name = "Motion 2"; 
+            
             var socket = io.connect('http://localhost:3000');
-//            var socket2 = io2.connect('http://localhost:3000');
-            socket.on('enter vote', function (data) {
-                $scope.user_name = data["user_name"];    
-                $scope.username = data["username"];    
-                $scope.clubname = data["clubname"];    
-                $scope.meeting_date = data["meeting_date"];    
-                $scope.motion_numb = data["motion_num"];    
-                $scope.meeting_id = data["meeting_id"];    
+            
+            $http.get('/api/getuser').then(function (response) {
+                if(response.data.is_authenticated) {
+                    $scope.username = response.data.user;
+                    socket.emit("join meeting",{ meeting_id: meeting_id, username: $scope.username });
+                    console.log($scope.username + " joined meeting");
+                }
+            })
+            
+            socket.on("no poll active", function(){
+                //hide everything      
+            });
+             
+            socket.on("invalid vote", function(){
+                //do something      
+            });
+             
+            socket.on('poll active', function (data) {
+                            
+                //get clubname
+                $http.get("/api/group/" + data["group_id"]).then(function(res){
+                    $scope.clubname = res.data.name;
+                });
+                
+                $scope.poll_options = data["poll_options"];
+                $scope.meeting_date = data["meeting_date"];      
                 $scope.poll_id = data["poll_id"];    
+                $scope.poll_name = data["poll_name"];    
+                $scope.poll_description = data["poll_description"]; 
             });
             
             $scope.vote = function(val){
-                socket.emit('submit vote', {vote: String(val), pid: $scope.poll_id, mid: $scope.meeting_id}, voter: $scope.username);
+                socket.emit('submit vote', {vote: String(val), username: $scope.username});
             }
         
         });
