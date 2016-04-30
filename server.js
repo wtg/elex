@@ -91,7 +91,8 @@ app.get('/createPoll', cas.block, function (req, res) {
 app.get('/executeCreation/:key', cas.block, function (req, res) {
     //change "etzinj" to "req.session.cas_user"
     //gets user's rin
-    cms.getRCS(req.session.cas_user).then(function (response) {
+    var rcsID = req.session.cas_user;
+    cms.getRCS(rcsID).then(function (response) {
         //gets user's clubs
         return cms.getOrgs(JSON.parse(response)["student_id"])
     }).then(function (docs){
@@ -102,7 +103,7 @@ app.get('/executeCreation/:key', cas.block, function (req, res) {
                 var g = Group({
                     name  : arr.name,
                     desc  : arr.description,
-                    admin : req.session.cas_user
+                    admin : rcsID
                 });
                 g.save(function (err, saved) {
                     if (err) {

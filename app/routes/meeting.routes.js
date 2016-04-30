@@ -14,19 +14,16 @@ module.exports = function(app, cas) {
     });
 
     app.get('/meetings/:key', cas.bounce, function (req, res) {console.log("3");
-        var rcsID = req.session.cas_user.toLowerCase;
-        var rcsID = "cardos";
-        User.findOne({'name' : rcsID}, function(err, user) {
-            Group.findOne({"_id" : req.params.key}, function(err, group){
-				console.log(group["admin"]+"admin");
-    			if(group["admin"] == user["id"]){
-					console.log(user["id"]);
-                    res.sendFile(path.resolve('views/meetingsAdmin.html'));
-                }else{
-					console.log(user["id"]+"member");
-                    res.sendFile(path.resolve('views/meetings.html'));
-                }
-            });
+        var rcsID = req.session.cas_user.toLowerCase();
+        Group.findOne({"_id" : req.params.key}, function(err, group){
+			console.log(group.admin+"admin");
+			if(group["admin"] == rcsID){
+				console.log(rcsID);
+                res.sendFile(path.resolve('views/meetingsAdmin.html'));
+            }else{
+				console.log(rcsID+"member");
+                res.sendFile(path.resolve('views/meetings.html'));
+            }
         });
     });
 
