@@ -4,7 +4,7 @@ var mongoose = require('mongoose');
 // module.exports allows us to pass this to other files when it is called
 module.exports = mongoose.model('Participant', {
   clientSocketID : String,
-  meetingID      : String,
+  meeting_id     : String,
   username       : String,
   ID             : mongoose.Schema.ObjectId
 });

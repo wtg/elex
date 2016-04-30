@@ -15,7 +15,7 @@
 				<h2 class="text-center vote-details">Sign in to continue</h2>
 			</div>
 		</div>
-		
+
 		<div class="row vote-buttons">
 			<form method="get" action="/auth" class="col-md-16 text-center">
 				<button type="submit" class="btn btn-danger btn-lg sign-in-button">
@@ -38,13 +38,13 @@
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
     integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
     crossorigin="anonymous"></script>
-    <script src="/socket.io/socket.io.js"></script>
+    <!-- <script src="/socket.io/socket.io.js"></script> -->
     <script>
-		var socket = io.connect('http://localhost:3000');
-		socket.on('socket_req', function (data) {
+		// var socket = io.connect('http://localhost:3000');
+		// socket.on('socket_req', function (data) {
 //        console.log(data);
 //        socket.emit('my other event', { my: 'data' });
-		});
+		// });
     </script>
 </body>
 </html>

@@ -42,7 +42,7 @@
                     <button class="btn btn-success btn-lg group-button text-center" id="submit" ng-click="submit()">
                         Submit
                     </button>
-                    <button type="submit" class="btn btn-danger btn-lg group-button text-center">
+                    <button ng-click="toggle_create()" class="btn btn-danger btn-lg group-button text-center">
                         Cancel
                     </button>
                 </div>
@@ -51,7 +51,7 @@
 
         <div ng-show="!create_poll">
 
-            <button ng-click="show_create()" class="btn btn-primary">Create Poll</button>
+            <button ng-click="toggle_create()" class="btn btn-primary">Create Poll</button>
         </div>
 
          <div class="row">
@@ -115,7 +115,7 @@
                 $scope.poll_options.splice(index, 1);
             };
 
-            socket.on("invalid")
+            // socket.on("invalid")
 
 
             $scope.toggle_create = function(){

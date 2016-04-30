@@ -32,6 +32,7 @@ module.exports = function (app, cas, server) {
     var io = socketIO(server);
 
     io.on('connection', function (socket) {
+        console.log('CLIENT JOINED', socket.id);
         /**
          * Socket listener for when a socket joins a meeting. Should include an
          * object with the meeting_id and username.
@@ -40,6 +41,8 @@ module.exports = function (app, cas, server) {
          *       data object in order to participate in votes.
          */
         socket.on('join meeting', function (details) {
+            console.log('CLIENT INITIATED JOIN MEETING', details);
+
             // if invalid credentials
             if(!details || !details.meeting_id || !details.username) {
                 socket.disconnect();
@@ -77,6 +80,7 @@ module.exports = function (app, cas, server) {
         });
 
         socket.on('create poll', function (poll_data) {
+            console.log("ENTERED CREATE");
             if(!poll_data || !poll_data.name || !poll_data.description || !poll_data.options || !poll_data.username) {
                 socket.emit('incomplete poll');
                 return;
@@ -88,18 +92,25 @@ module.exports = function (app, cas, server) {
                     return;
                 }
 
-                Meeting.findOne({ _id: details.meeting_id }).then(function (meeting) {
+                console.log("FOUND PARTICIPANT", participant);
+
+                Meeting.findOne({ _id: participant.meeting_id }).then(function (meeting) {
                     // invalid meeting
-                    if(!meeting || !meeting.activePollId) {
+                    if(!meeting) {
+                        console.log("HERE", meeting);
                         socket.emit('not authorized');
                         return;
                     }
+
+                    console.log("FOUND MEETING", meeting);
 
                     Group.findOne({ _id: meeting.group }).then(function (group) {
                         if(group.admin !== participant.username) {
                             socket.emit('not authorized');
                             return;
                         }
+
+                        console.log("FOUND GROUP", group);
 
                         var p = new Poll({
                             meeting     : meeting._id,
@@ -109,12 +120,23 @@ module.exports = function (app, cas, server) {
                         });
 
                         p.save(function (err, saved) {
+                            if(err) { throw err; }
+                            console.log("SAVED");
                             Meeting.update({ _id : meeting._id }, { activePollId: saved._id }).then(function (data) {
+                                console.log(data);
                                 emitPollActive(socket, meeting, saved);
-                            })
-                        })
+                            });
+                        });
+                    }, function (err) {
+                        console.error(err);
                     });
+                }, function (err) {
+                    console.error(err);
                 });
+
+                console.log("AFTER");
+            }, function (err) {
+                console.error(err);
             });
         });
 
@@ -132,7 +154,7 @@ module.exports = function (app, cas, server) {
                     return;
                 }
 
-                Meeting.findOne({ _id: details.meeting_id }).then(function (meeting) {
+                Meeting.findOne({ _id: participant.meeting_id }).then(function (meeting) {
                     // invalid meeting
                     if(!meeting || !meeting.activePollId) {
                         socket.emit('invalid vote');
