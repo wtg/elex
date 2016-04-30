@@ -62,7 +62,7 @@ var cas = new CASAuthentication({
     cas_url       : 'https://cas-auth.rpi.edu/cas',
     service_url   : 'http://localhost:3000/auth?',
     is_dev_mode   : true,
-    dev_mode_user : 'etzinj'
+    dev_mode_user : 'cardos'
 //    dev_mode_user : 'chens16'
 });
 
