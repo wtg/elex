@@ -17,8 +17,8 @@ var Vote        = require('../models/vote.model.js');
  * @param meeting {} the meeting details
  * @param poll    {} the poll details
  */
-function emitPollActive(target, meeting) {
-    console.log('emitPollActive1');
+function emitPollActive(io, meeting) {
+    console.log('emitPollActive1', meeting);
     Poll.findOne({ _id: meeting.activePollId }).then(function (poll) {
         console.log('emitPollActive2');
         Vote.find({ pollId: poll._id }).then(function (votes) {
@@ -35,7 +35,7 @@ function emitPollActive(target, meeting) {
                 total_votes++;
             }
 
-            target.emit('poll active', {
+            io.sockets.emit('poll active', {
                 group_id:         meeting.group,
                 meeting_id:       meeting._id,
                 meeting_date:     meeting.date,
@@ -51,8 +51,8 @@ function emitPollActive(target, meeting) {
     });
 }
 
-function emitNoPollActive(target, meeting) {
-    target.emit('no poll active', {
+function emitNoPollActive(io, meeting) {
+    io.sockets.emit('no poll active', {
         group_id:     meeting.group,
         meeting_id:   meeting._id,
         meeting_name: meeting.name,
@@ -98,12 +98,14 @@ module.exports = function (app, cas, server) {
                     }
 
                     socket.emit('join successful', meeting._id);
-
+                    console.log("HERE");
+                    try {
                     if(!meeting.activePollId) {
-                        emitNoPollActive(socket, meeting);
+                        emitNoPollActive(io, meeting);
                     } else {
-                        emitPollActive(socket, meeting);
+                        emitPollActive(io, meeting);
                     }
+                } catch(e) { console.log(e); }
                 });
             });
         });
@@ -156,7 +158,9 @@ module.exports = function (app, cas, server) {
                             if(err) console.error(err);
                             Meeting.update({ _id : meeting._id }, { activePollId: saved._id }).then(function (data) {
                                 console.log('EMITTING ACTIVE');
-                                emitPollActive(io.sockets, meeting);
+                                Meeting.findOne({ _id: meeting._id }).then(function (updated_meeting) {
+                                    emitPollActive(io, updated_meeting);
+                                })
                             });
                         });
                     }, function (err) {
@@ -178,7 +182,7 @@ module.exports = function (app, cas, server) {
                 }
 
                 Meeting.update({ _id: participant.meeting_id }, { activePollId: null }).then(function (meeting) {
-                    emitNoPollActive(io.sockets, meeting);
+                    emitNoPollActive(io, meeting);
                 })
             });
         });

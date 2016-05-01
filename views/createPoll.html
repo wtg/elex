@@ -143,7 +143,8 @@
             })
 
             socket.on("poll active", function (data) {
-                if($scope.meeting_id = data.meeting_id) {
+                if($scope.meeting_id === data.meeting_id && $scope.poll_id !== data.poll_id) {
+                    console.log('poll active', $scope.meeting_id);
                     console.log(data.poll_results);
                     $scope.poll_id = data.poll_id;
                     $scope.poll_active = true;
@@ -157,7 +158,8 @@
             });
 
             socket.on("no poll active", function (data) {
-                if($scope.meeting_id = data.meeting_id) {
+                console.log($scope.meeting_id);
+                if($scope.meeting_id === data.meeting_id) {
                     $scope.poll_id = null;
                     $scope.poll_active = false;
                     $scope.poll_name = "";
