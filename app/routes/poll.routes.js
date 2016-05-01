@@ -190,6 +190,12 @@ module.exports = function (app, cas, server) {
             });
         });
 
+		socket.on('meeting', function (meet){
+			Meeting.findOne({_id : meet}, function (m){
+				socket.emit('group', m.group);
+			});
+		});
+
         socket.on('disconnect', function () {
             Participant.remove({ clientSocketID: socket.id }).then(function (data) {
                 console.log("Socket " + socket.id + " successfully disconnected.");
