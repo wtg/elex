@@ -17,15 +17,26 @@ var Vote        = require('../models/vote.model.js');
  * @param meeting {} the meeting details
  * @param poll    {} the poll details
  */
-function emitPollActive(socket, meeting, poll) {
-    socket.emit('poll active', {
-        group_id:         meeting.group,
-        meeting_id:       meeting._id,
-        meeting_date:     meeting.date,
-        poll_id:          meeting.activePollId,
-        poll_name:        poll.name,
-        poll_description: poll.description,
-        poll_options:     poll.options
+function emitPollActive(socket, meeting) {
+    Poll.findOne({ _id: meeting.activePollId }).then(function (poll) {
+        socket.emit('poll active', {
+            group_id:         meeting.group,
+            meeting_id:       meeting._id,
+            meeting_date:     meeting.date,
+            poll_id:          meeting.activePollId,
+            poll_name:        poll.name,
+            poll_description: poll.description,
+            poll_options:     poll.options
+        });
+    });
+}
+
+function emitNoPollActive(socket, meeting) {
+    socket.emit('no poll active', {
+        group_id:     meeting.group,
+        meeting_id:   meeting._id,
+        meeting_name: meeting.name,
+        meeting_date: meeting.date
     });
 }
 
@@ -67,15 +78,9 @@ module.exports = function (app, cas, server) {
                     }
 
                     if(!meeting.activePollId) {
-                        socket.emit('no poll active', {
-                            group_id:     meeting.group,
-                            meeting_id:   meeting._id,
-                            meeting_date: meeting.date
-                        });
+                        emitNoPollActive(socket, meeting);
                     } else {
-                        Poll.findOne({ _id: meeting.activePollId }).then(function (poll) {
-                            emitPollActive(socket, meeting, poll);
-                        });
+                        emitPollActive(socket, meeting);
                     }
                 });
             });
@@ -112,8 +117,6 @@ module.exports = function (app, cas, server) {
                             return;
                         }
 
-                        console.log("FOUND GROUP", group);
-
                         var p = new Poll({
                             meeting     : meeting._id,
                             name        : poll_data.name,
@@ -122,10 +125,8 @@ module.exports = function (app, cas, server) {
                         });
 
                         p.save(function (err, saved) {
-                            if(err) { throw err; }
-                            console.log("SAVED");
+                            if(err) console.error(err);
                             Meeting.update({ _id : meeting._id }, { activePollId: saved._id }).then(function (data) {
-                                console.log(data);
                                 emitPollActive(socket, meeting, saved);
                             });
                         });
@@ -135,8 +136,6 @@ module.exports = function (app, cas, server) {
                 }, function (err) {
                     console.error(err);
                 });
-
-                console.log("AFTER");
             }, function (err) {
                 console.error(err);
             });
@@ -211,7 +210,7 @@ module.exports = function (app, cas, server) {
 	    var rcsID = req.session.cas_user.toLowerCase();
 
     	Meeting.findOne({"_id" : req.params.key}, function(err, meet){
-			console.log("meet: ");
+			console.log('/polls/' + req.params.key, meet);
     		Group.findOne({"_id" : meet.group}, function(err, group){
     			if(group.admin == rcsID){
     				res.sendFile(path.resolve('views/polls.html'));

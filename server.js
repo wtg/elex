@@ -9,6 +9,7 @@ var methodOverride    = require('method-override');
 var session           = require('express-session');
 var CASAuthentication = require('cas-authentication');
 var mongoose          = require('mongoose');
+var morgan            = require('morgan');
 var config            = require('./config.js');
 var cms               = require('cms-api')(config.cms_api_token);
 
@@ -28,6 +29,9 @@ var port = process.env.PORT || 3000;
 // connect to our mongoDB database
 // (uncomment after you enter in your own credentials in config/db.js)
 mongoose.connect(db.url);
+
+// morgan route logger middleware
+app.use(morgan('dev'));
 
 // get all data/stuff of the body (POST) parameters
 // parse application/json
