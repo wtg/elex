@@ -68,4 +68,11 @@ module.exports = function(app, cas) {
 
         res.sendFile(path.resolve('views/createMeeting.html'));
     });
+
+    app.get('/cancel/:key', function (req, res){
+        console.log(req.params.key);
+        Meeting.find({}, function(resp){
+            console.log(resp);
+        });
+    });
 }

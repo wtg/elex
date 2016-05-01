@@ -82,6 +82,7 @@
 
     <script>
         var meeting_id = window.location.href.split('/').pop();
+		var ctx = $("#chart");
 
         // remove any trailing '?'s
         if(meeting_id[meeting_id.length - 1] === '?') {
@@ -197,6 +198,7 @@
                 });
 
                 $scope.clear();
+                createGraph($scope.new_poll.poll_name, )
             }
 
             $scope.clear = function () {
@@ -220,114 +222,40 @@
 		    var randomColor = function(opacity) {
 		        return 'rgba(' + randomColorFactor() + ',' + randomColorFactor() + ',' + randomColorFactor() + ',' + (opacity || '.3') + ')';
 		    };
+		    function createGraph(name, desc, opts, user){
+		    	window.myPie = new Chart(ctx, config);
+		    	var colors = [];
+		    	var zeros = [];
+		    	opts.forEach(function(opt){
+		    		colors.push(randomColor(1));
+		    		zeros.push(0);
+		    	});
 
-		    var config = {
-		        type: 'pie',
-		        data: {
-		            datasets: [{
-		                data: [
-		                    randomScalingFactor(),
-		                    randomScalingFactor(),
-		                    randomScalingFactor(),
-		                    randomScalingFactor(),
-		                    randomScalingFactor(),
-		                ],
-		                backgroundColor: [
-		                    "#F7464A",
-		                    "#46BFBD",
-		                    "#FDB45C",
-		                    "#949FB1",
-		                    "#4D5360",
-		                ],
-		                label: 'Dataset 1'
-		            }],
-		            labels: [
-		                "Red",
-		                "Green",
-		                "Yellow",
-		                "Grey",
-		                "Dark Grey"
-		            ]
-		        },
-		        options: {
-		            responsive: true,
-		            legend: {
-		                position: 'top',
-		            },
-		            title: {
-		                display: true,
-		                text: 'Chart.js Doughnut Chart'
-		            },
-		            animation: {
-		                animateScale: true,
-		                animateRotate: true
-		            }
-		        }
-		    };
-
-		    window.onload = function() {
-		        var ctx = $("#chart");
-		        window.myPie = new Chart(ctx, config);
-		    };
-
-		    $('#randomizeData').click(function() {
-		        $.each(config.data.datasets, function(i, dataset) {
-		            dataset.data = dataset.data.map(function() {
-		                return randomScalingFactor();
-		            });
-
-		            dataset.backgroundColor = dataset.backgroundColor.map(function() {
-		                return randomColor(0.7);
-		            });
-		        });
-
-		        window.myPie.update();
-		    });
-
-		    $('#addDataset').click(function() {
-		        var newDataset = {
-		            backgroundColor: [],
-		            data: [],
-		            label: 'New dataset ' + config.data.datasets.length,
-		        };
-
-		        for (var index = 0; index < config.data.labels.length; ++index) {
-		            newDataset.data.push(randomScalingFactor());
-		            newDataset.backgroundColor.push(randomColor(0.7));
-		        }
-
-		        config.data.datasets.push(newDataset);
-		        window.myPie.update();
-		    });
-
-		    $('#addData').click(function() {
-		        if (config.data.datasets.length > 0) {
-		            config.data.labels.push('data #' + config.data.labels.length);
-
-		            $.each(config.data.datasets, function(index, dataset) {
-		                dataset.data.push(randomScalingFactor());
-		                dataset.backgroundColor.push(randomColor(0.7));
-		            });
-
-		            window.myPie.update();
-		        }
-		    });
-
-		    $('#removeDataset').click(function() {
-		        config.data.datasets.splice(0, 1);
-		        window.myPie.update();
-		    });
-
-		    $('#removeData').click(function() {
-		        config.data.labels.splice(-1, 1); // remove the label first
-
-		        config.data.datasets.forEach(function(dataset, datasetIndex) {
-		            dataset.data.pop();
-		            dataset.backgroundColor.pop();
-		        });
-
-		        window.myPie.update();
-		    });
+			    var config = {
+			        type: 'pie',
+			        data: {
+			            datasets: [{
+			                data: zeros,
+			                backgroundColor: colors
+			            }],
+			            labels: opts
+			        },
+			        options: {
+			            responsive: true,
+			            legend: {
+			                position: 'top',
+			            },
+			            title: {
+			                display: false,
+			                text: name
+			            },
+			            animation: {
+			                animateScale: true,
+			                animateRotate: true
+			            }
+			        }
+			    };
+		    }
 
             $scope.showOptionInfo = function (option) {
                 if(!$scope.poll_results) {

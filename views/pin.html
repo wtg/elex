@@ -24,7 +24,11 @@
 						Submit
 					</button>
 				</form>
-				<div id="cancel"></div>
+				<form id="cancel">
+					<button type="submit" class="btn btn-danger btn-lg group-button text-center">
+						Cancel
+					</button>
+				</form>
 			</div>
 		</div>
 
@@ -55,7 +59,7 @@
 
 		$(document).ready(function () {
 			$('#submitForm').attr('method', 'post').attr('action', '/vote/' + meeting_id);
-			$('#cancel').html("<form method=\"get\" action=\"/meetings/" + group_id + "\"><button type=\"submit\" class=\"btn btn-danger btn-lg group-button text-center\">Cancel</button></form>");
+			$('#cancel').attr('method', 'get').attr('action', '/cancel/' + meeting_id);
 		})
 
 		</script>
