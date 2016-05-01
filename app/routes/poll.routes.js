@@ -17,7 +17,7 @@ var Vote        = require('../models/vote.model.js');
  * @param meeting {} the meeting details
  * @param poll    {} the poll details
  */
-function emitPollActive(io, meeting) {
+function emitPollActive(target, meeting) {
     console.log('emitPollActive1');
     Poll.findOne({ _id: meeting.activePollId }).then(function (poll) {
         console.log('emitPollActive2');
@@ -35,7 +35,7 @@ function emitPollActive(io, meeting) {
                 total_votes++;
             }
 
-            io.sockets.emit('poll active', {
+            target.emit('poll active', {
                 group_id:         meeting.group,
                 meeting_id:       meeting._id,
                 meeting_date:     meeting.date,
@@ -51,8 +51,8 @@ function emitPollActive(io, meeting) {
     });
 }
 
-function emitNoPollActive(io, meeting) {
-    io.sockets.emit('no poll active', {
+function emitNoPollActive(target, meeting) {
+    target.emit('no poll active', {
         group_id:     meeting.group,
         meeting_id:   meeting._id,
         meeting_name: meeting.name,
@@ -97,15 +97,20 @@ module.exports = function (app, cas, server) {
                         return;
                     }
 
-                    console.log('the meeting', meeting);
+                    socket.emit('join successful', meeting._id);
 
                     if(!meeting.activePollId) {
-                        emitNoPollActive(io, meeting);
+                        emitNoPollActive(socket, meeting);
                     } else {
-                        console.log("TRYING TO EMIT ACTIVE");
-                        emitPollActive(io, meeting);
+                        emitPollActive(socket, meeting);
                     }
                 });
+            });
+        });
+
+        socket.on('disconnect', function () {
+            Participant.remove({ clientSocketID: socket.id }).then(function (participant) {
+                io.sockets.emit('admin socket disconnected', socket.id);
             });
         });
 
@@ -151,7 +156,7 @@ module.exports = function (app, cas, server) {
                             if(err) console.error(err);
                             Meeting.update({ _id : meeting._id }, { activePollId: saved._id }).then(function (data) {
                                 console.log('EMITTING ACTIVE');
-                                emitPollActive(io, meeting);
+                                emitPollActive(io.sockets, meeting);
                             });
                         });
                     }, function (err) {
@@ -173,7 +178,7 @@ module.exports = function (app, cas, server) {
                 }
 
                 Meeting.update({ _id: participant.meeting_id }, { activePollId: null }).then(function (meeting) {
-                    emitNoPollActive(io, meeting);
+                    emitNoPollActive(io.sockets, meeting);
                 })
             });
         });
@@ -205,6 +210,7 @@ module.exports = function (app, cas, server) {
                             Vote.update({ _id : vote._id }, { val: vote_data.vote }).then(function (data) {
                                 socket.emit('vote recorded');
                                 io.sockets.emit('admin vote updated', {
+                                    meeting_id: participant.meeting_id,
                                     new: vote_data.vote,
                                     old: vote.val
                                 });
@@ -219,7 +225,8 @@ module.exports = function (app, cas, server) {
 
                             v.save(function (err, saved) {
                                 socket.emit('vote recorded', saved.val);
-                                io.sockets.emit('admin vote added', saved.val);
+                                saved.meeting_id = participant.meeting_id;
+                                io.sockets.emit('admin vote added', saved);
                             });
                         }
                     });
