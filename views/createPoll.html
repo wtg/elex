@@ -170,7 +170,7 @@
             });
 
             socket.on("admin socket authenticated", function (user_data) {
-                if($scope.meeting_id === data.meeting_id) {
+                if($scope.meeting_id === user_data.meeting_id) {
                     $scope.current_users.push(user_data);
 
                     if($scope.unique_users.indexOf(user_data.username) === -1) {
