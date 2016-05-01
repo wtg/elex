@@ -1,4 +1,5 @@
 var path   = require('path');
+var Q      = require('q');
 var config = require('../../config.js');
 var cms    = require('cms-api')(config.cms_api_token);
 var Group  = require('../models/group.model.js');
@@ -23,6 +24,10 @@ module.exports = function(app, cas) {
 
         var user = req.session.cas_user.toLowerCase();
         var rin = '';
+
+        var getAllOrgResults = Q.defer();
+        var getOrgResults = Q.defer();
+
         cms.getRCS(user).then(function (response) {
             rin = JSON.parse(response)["student_id"];
             return cms.getAllOrgs(rin);
@@ -33,19 +38,30 @@ module.exports = function(app, cas) {
             resp.forEach(function(arr) {
                 Group.findOne({ casEntity: arr.entity_id }).then(function (group) {
                     if(!group) {
+                        console.log('NON ADMIN, NEW GROUP', arr.name);
                         Group({
                             name      : arr.name,
                             desc      : arr.description,
                             admin     : null,
                             casEntity : arr.entity_id,
                             allowed   : [user]
-                        }).save();
+                        }).save(function (err, saved) {
+                            numProcessed++;
+                            if(numProcessed === resp.length) {
+                                getAllOrgResults.resolve();
+                            }
+                        });
                     } else {
+                        console.log('NON ADMIN, EXISTING GROUP', group.name);
                         if(group.allowed.indexOf(user) === -1) {
                             group.allowed.push(user);
                         }
-
-                        Group.update({ _id : group._id }, { allowed: group.allowed });
+                        Group.update({ _id : group._id }, { allowed: group.allowed }).then(function () {
+                            numProcessed++;
+                            if(numProcessed === resp.length) {
+                                getAllOrgResults.resolve();
+                            }
+                        })
                     }
                 }, function (err) {
                     throw err;
@@ -53,12 +69,13 @@ module.exports = function(app, cas) {
             });
 
             return cms.getOrgs(rin);
-        }).then(function (docs){
+        }).then(function (docs) {
             var numProcessed = 0; // this ensures the data isn't returned until we're done
             var resp = JSON.parse(docs);
             resp.forEach(function(arr) {
                 Group.findOne({ casEntity: arr.entity_id }).then(function (group) {
                     if (!group) {
+                        console.log('ADMIN, NEW GROUP', arr.name);
                         var g = Group({
                             name      : arr.name,
                             desc      : arr.description,
@@ -73,13 +90,12 @@ module.exports = function(app, cas) {
                             } else {
                                 numProcessed++;
                                 if(numProcessed === resp.length) {
-                                    Group.find({ $or: [{allowed: user}, {admin: user}] }, function (err, groups) {
-                                        res.json(groups);
-                                    });
+                                    getOrgResults.resolve();
                                 }
                             }
                         });
                     } else {
+                        console.log('ADMIN, EXISTING GROUP', group.name);
                         if(!group.admin) {
                             group.admin = user;
                         }
@@ -91,15 +107,22 @@ module.exports = function(app, cas) {
                         Group.update({ _id : group._id }, { admin: group.admin, allowed: group.allowed }).then(function (data) {
                             numProcessed++;
                             if(numProcessed === resp.length) {
-                                Group.find({ $or: [{allowed: user}, {admin: user}] }, function (err, groups) {
-                                    res.json(groups);
-                                });
+                                getOrgResults.resolve();
                             }
                         })
                     }
                 }, function (err) {
                     throw err;
                 });
+            });
+        });
+
+        Q.all([
+            getAllOrgResults,
+            getOrgResults
+        ]).then(function () {
+            Group.find({ $or: [{allowed: user}, {admin: user}] }, function (err, groups) {
+                res.json(groups);
             });
         });
     });

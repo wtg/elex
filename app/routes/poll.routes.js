@@ -180,10 +180,9 @@ module.exports = function (app, cas, server) {
                             });
 
                             v.save(function (err, saved) {
-                                socket.emit('vote recorded');
+                                socket.emit('vote recorded', saved.val);
 
                                 // TODO: emit updated stats to admin
-                                socket.emit('admin vote updated');
                             });
                         }
                     });
