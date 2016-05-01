@@ -8,6 +8,7 @@ var Poll        = require('../models/poll.model.js');
 var Participant = require('../models/participant.model.js');
 var Group       = require('../models/group.model.js');
 var User        = require('../models/user.model.js');
+var Vote        = require('../models/vote.model.js');
 
 /**
  * Emits the details of an active vote to the client. Used when a vote is created
@@ -208,4 +209,10 @@ module.exports = function (app, cas, server) {
     		});
     	});
 	});
+
+	app.get('/api/votes/:key', function (req, res) {
+        Vote.find({pollId : req.params.key}, function(err, docs){
+              res.json(docs);
+        });
+    });
 }
