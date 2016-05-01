@@ -17,7 +17,7 @@
 
 		<div class="row vote-buttons">
 			<div class="col-md-16">
-				<form method="post" action="/vote">
+				<form id="submitForm">
 					<label for="pin" class="vote-details">Enter PIN:</label>
 					<input type="text" class="form-control" name="pin" id="pin"/>
 					<button type="submit" class="btn btn-success btn-lg group-button text-center">
@@ -46,21 +46,18 @@
     <script src="/socket.io/socket.io.js"></script>
 
     <script>
-		var socket = io.connect('http://localhost:3000');
-		var group_id = window.location.href.split('/').pop();
+		var meeting_id = window.location.href.split('/').pop();
 
 		// remove any trailing '?'s
-		if(group_id[group_id.length - 1] === '?') {
-			group_id = group_id.slice(0, -1);
+		if(meeting_id[meeting_id.length - 1] === '?') {
+			meeting_id = meeting_id.slice(0, -1);
 		}
 
+		$(document).ready(function () {
+			$('#submitForm').attr('method', 'post').attr('action', '/vote/' + meeting_id);
+			$('#cancel').html("<form method=\"get\" action=\"/meetings/" + group_id + "\"><button type=\"submit\" class=\"btn btn-danger btn-lg group-button text-center\">Cancel</button></form>");
+		})
 
-
-		$('#cancel').html("<form method=\"get\" action=\"/meetings/" + group_id + "\">
-							<button type=\"submit\" class=\"btn btn-danger btn-lg group-button text-center\">
-								Cancel
-							</button>
-						</form>");
-    </script>
+		</script>
 </body>
 </html>

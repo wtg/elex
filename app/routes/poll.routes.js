@@ -23,6 +23,7 @@ function emitPollActive(socket, meeting) {
             group_id:         meeting.group,
             meeting_id:       meeting._id,
             meeting_date:     meeting.date,
+            meeting_name:     meeting.name,
             poll_id:          meeting.activePollId,
             poll_name:        poll.name,
             poll_description: poll.description,
@@ -211,8 +212,8 @@ module.exports = function (app, cas, server) {
 
     	Meeting.findOne({"_id" : req.params.key}, function(err, meet){
 			console.log('/polls/' + req.params.key, meet);
-    		Group.findOne({"_id" : meet.group}, function(err, group){
-    			if(group.admin == rcsID){
+    		Group.findOne({"_id" : meet.group}, function(err, group) {
+    			if(group.admin == rcsID) {
     				res.sendFile(path.resolve('views/polls.html'));
     			}else{
     				res.sendFile(path.resolve('views/pin.html'));
@@ -221,9 +222,18 @@ module.exports = function (app, cas, server) {
     	});
 	});
 
+    app.post('/vote/:key', cas.block, function ( req, res ) {
+        if (!req.body.pin || !req.params.key) {
+            res.redirect('/joinvote')
+            return;
+        }
+
+        res.sendFile(path.resolve('views/vote.html'));
+    });
+
 	app.get('/api/votes/:key', function (req, res) {
         Vote.find({pollId : req.params.key}, function(err, docs){
-              res.json(docs);
+            res.json(docs);
         });
     });
 

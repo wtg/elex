@@ -64,10 +64,9 @@ app.use(session({
 
 var cas = new CASAuthentication({
     cas_url       : 'https://cas-auth.rpi.edu/cas',
-    service_url   : 'http://localhost:3000/auth?',
-    is_dev_mode   : true,
-    dev_mode_user : 'villat2'
-//    dev_mode_user : 'chens16'
+    service_url   : 'http://129.161.208.143:3000/auth?'
+    // , is_dev_mode   : true
+    // , dev_mode_user : 'villat2'
 });
 
 app.get('/', function (req, res) {
@@ -79,10 +78,6 @@ app.get('/', function (req, res) {
 })
 
 app.get('/logout', cas.logout);
-
-app.get('/vote', cas.block, function (req, res) {
-    res.sendFile(__dirname + '/views/vote.html')
-});
 
 app.get('/executeCreation/:key', cas.block, function (req, res) {
     //change "etzinj" to "req.session.cas_user"
@@ -114,15 +109,6 @@ app.get('/executeCreation/:key', cas.block, function (req, res) {
         });
         res.redirect('/createGroup');
     });
-});
-
-app.post('/vote', cas.block, function ( req, res ) {
-    if (!req.body.pin) {
-        res.redirect('/joinvote')
-        return;
-    }
-
-    res.sendFile(__dirname + '/views/vote.html');
 });
 
 // routes ==================================================
