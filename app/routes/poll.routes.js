@@ -222,4 +222,8 @@ module.exports = function (app, cas, server) {
               res.json(docs);
         });
     });
+
+    app.get('/view', function (req, res){
+    	res.sendFile(path.resolve('views/view.html'));
+    });
 }
