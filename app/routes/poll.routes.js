@@ -33,7 +33,6 @@ module.exports = function (app, cas, server) {
     var io = socketIO(server);
 
     io.on('connection', function (socket) {
-        console.log('CLIENT JOINED', socket.id);
         /**
          * Socket listener for when a socket joins a meeting. Should include an
          * object with the meeting_id and username.
@@ -57,6 +56,8 @@ module.exports = function (app, cas, server) {
 
             p.save(function (err, saved) {
                 console.log('Socket ' + socket.id + ' successfully authenticated as ' + details.username + ' on meeting ' + details.meeting_id);
+
+                socket.emit('admin socket authenticated', saved);
 
                 Meeting.findOne({ _id: details.meeting_id }).then(function (meeting) {
                     // invalid meeting
@@ -189,6 +190,12 @@ module.exports = function (app, cas, server) {
                 });
             });
         });
+
+        socket.on('disconnect', function () {
+            Participant.remove({ clientSocketID: socket.id }).then(function (data) {
+                console.log("Socket " + socket.id + " successfully disconnected.");
+            });
+        })
     });
 
 	app.get('/createPoll/:key', cas.block, function (req, res) {

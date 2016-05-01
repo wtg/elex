@@ -1,0 +1,35 @@
+.header {
+  margin-top: 5%;
+  color: white;
+  margin-bottom: 15%;
+  font-size: 80px;
+}
+label {
+  color: white;
+  margin-top: 1%;
+}
+.vote-buttons {
+  margin-bottom: 7%;
+}
+.user-details {
+  color: white;
+  font-size: 20px;
+}
+.form-control{
+  margin-bottom:10px;
+}
+.cancel-button{
+  background-image:url("/cancelButton.png");
+  background-color:transparent;
+  width:20px;
+  height:20px;
+  border:0;
+  margin-left:10px;
+  display: none;
+}
+#options li span:hover{
+  background-color: DimGray;
+}
+#options li:hover .cancel-button{
+  display:inline;
+}

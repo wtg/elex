@@ -4,54 +4,60 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
 	integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-	<link rel="stylesheet" type="text/css" href="/createGroup.css">
+	<link rel="stylesheet" type="text/css" href="/pollAdmin.css">
 </head>
 
 <body style="background-color: rgb(33,37,46)">
-	<div class="container" ng-app="poll" ng-controller="poll_ctrl">
-
-        <div ng-show="create_poll">
-            <div class="row">
-                <div class="col-xs-12">
-                    <h1 class="text-center header">Create a New Poll</h1>
-                </div>
-            </div>
-
-            <div class="row vote-buttons">
-                <div class="col-md-16">
-                    <label for="name" class="vote-details">Poll Name:</label>
-                    <input type="text" class="form-control" name="name" id="name" ng-model="poll_name"/>
-
-                    <label for="desc" class="vote-details">Description:</label>
-                    <textarea type="text" rows="5" class="form-control" name="desc" id="desc" ng-model="poll_description"></textarea>
-
-                    <label for="options" class="vote-details">Poll Options:</label>
-
-                    <div class="row">
-                        <div class="col-md-4">
-                             <input id="newOption" type="text" class="form-control" placeholder="+  New option" ng-model="newOption" type="text">
-                        </div>
-                        <button ng-click="add(newOption)" class="btn-default btn-sm">Add</button>
-
-
-                    </div>
-                    <ul id="options">
-                        <li ng-repeat="i in poll_options" class="user-details" ng-click="remove($index)">{{i}}</li>
-                    </ul>
-
-                    <button class="btn btn-success btn-lg group-button text-center" id="submit" ng-click="submit()">
-                        Submit
-                    </button>
-                    <button ng-click="toggle_create()" class="btn btn-danger btn-lg group-button text-center">
-                        Cancel
-                    </button>
-                </div>
+    <div class="container" ng-app="poll" ng-controller="poll_ctrl">
+        <div class="row">
+            <div class="col-xs-12">
+                <h1 class="text-center" style="color:white">Meeting for The Poly</h1>
             </div>
         </div>
+        <div class="row" style="margin-top: 40px;">
+            <div class="col-md-4">
+                <label for="name" class="vote-details">Poll Name:</label>
+                <input type="text" class="form-control" name="name" id="name" ng-model="poll_name">
 
-        <div ng-show="!create_poll">
+                <label for="desc" class="vote-details">Description:</label>
+                <textarea type="text" rows="5" class="form-control" name="desc" id="desc" ng-model="poll_description"></textarea>
 
-            <button ng-click="toggle_create()" class="btn btn-primary">Create Poll</button>
+                <label for="options" class="vote-details">Poll Options:</label>
+
+                <div class="row">
+                    <div class="col-md-4">
+                         <input id="newOption" type="text" class="form-control" placeholder="+  New option" ng-model="newOption" type="text">
+                    </div>
+                    <button ng-click="add(newOption)" class="btn-default btn-sm">Add</button>
+
+
+                </div>
+                <ul id="options">
+                    <li ng-repeat="i in poll_options" class="user-details" ng-click="remove($index)">{{i}}</li>
+                </ul>
+
+                <button class="btn btn-success btn-lg group-button text-center" id="submit" ng-click="submit()">
+                    Submit
+                </button>
+                <button ng-click="toggle_create()" class="btn btn-danger btn-lg group-button text-center">
+                    Cancel
+                </button>
+                <hr style="border-top: 1px solid rgb(80, 88, 105);">
+                <ul class="list-group">
+                    <li class="list-group-item" ng-repeat="u in unique_users" ng-bind="u"></li>
+                </ul>
+            </div>
+            <div class="col-md-8" style="color: white;">
+                <h2><button class="btn btn-danger pull-right">Close Poll</button>Active Poll: pollName</h2>
+                <p>Description: pollDesc</p>
+                <p>Options:</p>
+                <ul>
+                    <li>Yes: 24/26</li>
+                    <li>No: 1/26</li>
+                    <li>Abstain: 1/26</li>
+                </ul>
+                <canvas id="chart"></canvas>
+            </div>
         </div>
 
          <div class="row">
@@ -65,8 +71,6 @@
             </div>
         </div>
     </div>
-
-
 
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
     integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
@@ -90,7 +94,9 @@
             $scope.poll_description = "";
             $scope.poll_options = [];
             $scope.username = "";
-            $scope.create_poll = false;
+            $scope.poll_active = true;
+            $scope.current_users = [];
+            $scope.unique_users = [];
 
             $http.get('/api/getuser').then(function (response) {
                 if(response.data.is_authenticated) {
@@ -115,13 +121,32 @@
                 $scope.poll_options.splice(index, 1);
             };
 
-            // socket.on("invalid")
+            socket.on("poll active", function (data) {
+                $scope.poll_active = true;
+                $scope.poll_name = data.poll_name;
+                $scope.poll_description = data.poll_description;
+                $scope.poll_options = data.poll_options;
+            });
+
+            socket.on("no poll active", function () {
+                $scope.poll_active = false;
+                $scope.poll_name = "";
+                $scope.poll_description = "";
+                $scope.poll_options = [];
+            });
+
+            socket.on("admin socket authenticated", function (user_data) {
+                $scope.current_users.push(user_data);
+
+                if($scope.unique_users.indexOf(user_data.username) === -1) {
+                    $scope.unique_users.push(user_data.username);
+                }
+            });
 
 
             $scope.toggle_create = function(){
                 $scope.create_poll = !$scope.create_poll;
             }
-
 
             $scope.submit = function(){
                 socket.emit("create poll", {name: $scope.poll_name, description: $scope.poll_description, options: $scope.poll_options, username: $scope.username});
