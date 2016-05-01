@@ -1,5 +1,4 @@
 // server.js
-
 // modules =================================================
 var express           = require('express');
 var app               = express();
@@ -20,11 +19,15 @@ var cms               = require('cms-api')(config.cms_api_token);
 //     console.log(response);
 // });
 
+
+//process.env['PORT'] = 2323;
+
 // config files
 var db = require('./config/db');
 
 // set our port
 var port = process.env.PORT || 3000;
+var ip = process.env.IP || "129.161.208.143";
 
 // connect to our mongoDB database
 // (uncomment after you enter in your own credentials in config/db.js)
