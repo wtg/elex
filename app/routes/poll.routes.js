@@ -83,6 +83,7 @@ module.exports = function (app, cas, server) {
                     if(!meeting.activePollId) {
                         emitNoPollActive(socket, meeting);
                     } else {
+                        console.log("TRYING TO EMIT ACTIVE");
                         emitPollActive(socket, meeting);
                     }
                 });
@@ -130,6 +131,7 @@ module.exports = function (app, cas, server) {
                         p.save(function (err, saved) {
                             if(err) console.error(err);
                             Meeting.update({ _id : meeting._id }, { activePollId: saved._id }).then(function (data) {
+                                console.log('EMITTING ACTIVE');
                                 emitPollActive(socket, meeting);
                             });
                         });
@@ -171,7 +173,10 @@ module.exports = function (app, cas, server) {
                                 socket.emit('vote recorded');
 
                                 // TODO: emit updated stats to admin
-                                socket.emit('admin vote updated');
+                                socket.emit('admin vote updated', {
+                                    new: vote_data.vote,
+                                    old: vote.val
+                                });
                             })
                         } else {
                             // case for new vote
@@ -185,6 +190,7 @@ module.exports = function (app, cas, server) {
                                 socket.emit('vote recorded', saved.val);
 
                                 // TODO: emit updated stats to admin
+                                socket.emit('admin vote added', saved.val);
                             });
                         }
                     });
@@ -211,6 +217,10 @@ module.exports = function (app, cas, server) {
     		});
     	});
 	});
+
+    app.get('/vote/:key', cas.block, function (req, res) {
+        res.redirect('/polls/' + req.params.key);
+    });
 
     app.post('/vote/:key', cas.block, function ( req, res ) {
         if (!req.body.pin || !req.params.key) {

@@ -175,7 +175,7 @@
                 $scope.unique_users.splice($scope.unique_users.indexOf(username), 1);
             });
 
-            socket.on('vote recorded', function (val) {
+            socket.on('admin vote added', function (val) {
                 if(!$scope.vote_results[val]) {
                     $scope.vote_results[val] = 1;
                 } else {
@@ -184,6 +184,19 @@
                 $scope.poll_total_votes++;
                 $scope.$apply();
             });
+
+            socket.on('admin vote updated', function (vals) {
+                if($scope.vote_results[vals.old]) {
+                    $scope.vote_results[vals.old]--;
+                }
+
+                if(!$scope.vote_results[vals.new]) {
+                    $scope.vote_results[vals.new] = 1;
+                } else {
+                    $scope.vote_results[vals.new]++;
+                }
+                $scope.$apply();
+            })
 
             $scope.toggle_create = function(){
                 $scope.create_poll = !$scope.create_poll;

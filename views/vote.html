@@ -12,12 +12,12 @@
         <div ng-if="poll_active">
             <div class="row">
                 <div class="col-xs-12">
-                    <h1 class="text-center header">{{meeting_name}} &ndash; {meeting_date}}</h1>
+                    <h1 class="text-center header">{{meeting_name}} &ndash; {{meeting_date}}</h1>
                     <h2 class="text-center vote-details">You are voting on: {{poll_name}}</h2>
                 </div>
             </div>
             <div class="row vote-buttons">
-                <div ng-repeat="value in poll_values" class="col-md-4 text-center">
+                <div ng-repeat="value in poll_options" class="col-md-4 text-center">
                     <button class="btn btn-default btn-lg vote-button" ng-click = "vote(value)">
                         <i class="fa fa-thumbs-up"></i>
                         {{value}}
@@ -45,7 +45,7 @@
         <div ng-if="!poll_active">
             <div class="row">
                 <div class="col-xs-12">
-                    <h1 class="text-center header">{{meeting_name}} - {{meeting_date}}</h1>
+                    <h1 class="text-center header">{{meeting_name}} &ndash; {{meeting_date}}</h1>
                     <h2 class="text-center vote-details">There's no active poll! This page will update when one is ready.</h2>
                 </div>
             </div>
@@ -69,11 +69,13 @@
 
         var app = angular.module("vote",[]);
         app.controller("vote_ctrl",function($scope,$http){
-            var socket = io.connect('http://localhost:3000');
+            var l = document.createElement("a");
+            l.href = window.location.href;
+            var socket = io.connect('http://' + l.host);
 
             $scope.meeting_name = '';
             $scope.meeting_date = "";
-            $scope.poll_values = [];
+            $scope.poll_options = [];
             $scope.clubname = "";
             $scope.username = "";
             $scope.poll_id = "";
@@ -86,7 +88,7 @@
                 console.log(response.data.is_authenticated);
                 if(response.data.is_authenticated) {
                     $scope.username = response.data.user;
-                    socket.emit("join meeting",{
+                    socket.emit("join meeting", {
                         meeting_id: meeting_id,
                         username: $scope.username
                     });
@@ -95,6 +97,7 @@
             })
 
             socket.on("no poll active", function(data) {
+                console.log('no poll active');
                 //hide everything
 
                 //get clubname
@@ -118,7 +121,7 @@
             });
 
             socket.on('poll active', function (data) {
-
+                console.log('poll active');
                 //get clubname
                 if(!$scope.clubname) {
                     $http.get("/api/group/" + data["group_id"]).then(function(res){

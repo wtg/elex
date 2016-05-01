@@ -13,7 +13,7 @@ module.exports = function(app, cas) {
         res.redirect('/groups');
     });
 
-    app.get('/meetings/:key', cas.bounce, function (req, res) {console.log("3");
+    app.get('/meetings/:key', cas.bounce, function (req, res) {
         var rcsID = req.session.cas_user.toLowerCase();
         Group.findOne({_id : req.params.key}, function(err, group){
 			console.log(group.admin+"admin");
