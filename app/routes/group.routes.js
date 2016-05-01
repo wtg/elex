@@ -137,4 +137,9 @@ module.exports = function(app, cas) {
             res.json(groups);
         });
     })
+
+    // ALIAS FOR /api/groups/:id
+    app.get('/api/group/:id', function (req, res) {
+        res.redirect('/api/groups/' + req.params.id);
+    })
 }

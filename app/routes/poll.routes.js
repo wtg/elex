@@ -78,6 +78,8 @@ module.exports = function (app, cas, server) {
                         return;
                     }
 
+                    console.log('the meeting', meeting);
+
                     if(!meeting.activePollId) {
                         emitNoPollActive(socket, meeting);
                     } else {
@@ -128,7 +130,7 @@ module.exports = function (app, cas, server) {
                         p.save(function (err, saved) {
                             if(err) console.error(err);
                             Meeting.update({ _id : meeting._id }, { activePollId: saved._id }).then(function (data) {
-                                emitPollActive(socket, meeting, saved);
+                                emitPollActive(socket, meeting);
                             });
                         });
                     }, function (err) {

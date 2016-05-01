@@ -4,7 +4,7 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
 	integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-	<link rel="stylesheet" type="text/css" href="vote.css">
+	<link rel="stylesheet" type="text/css" href="/vote.css">
 </head>
 
 <body style="background-color: rgb(33,37,46)">
@@ -83,10 +83,13 @@
             // var socket = io.connect('http://localhost:3000');
 
             $http.get('/api/getuser').then(function (response) {
+                console.log(response.data.is_authenticated);
                 if(response.data.is_authenticated) {
                     $scope.username = response.data.user;
-                    console.log('test')
-                    socket.emit("join meeting",{ meeting_id: meeting_id, username: $scope.username });
+                    socket.emit("join meeting",{
+                        meeting_id: meeting_id,
+                        username: $scope.username
+                    });
                     console.log($scope.username + " joined meeting");
                 }
             })
