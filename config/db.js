@@ -1,3 +1,3 @@
-module.exports = {
-  url : 'mongodb://localhost/elex'
+module.exports = function (ip) {
+  return 'mongodb://' + (ip || 'localhost') + '/elex';
 }

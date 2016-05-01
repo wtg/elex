@@ -17,23 +17,42 @@ var Vote        = require('../models/vote.model.js');
  * @param meeting {} the meeting details
  * @param poll    {} the poll details
  */
-function emitPollActive(socket, meeting) {
+function emitPollActive(io, meeting) {
+    console.log('emitPollActive1');
     Poll.findOne({ _id: meeting.activePollId }).then(function (poll) {
-        socket.emit('poll active', {
-            group_id:         meeting.group,
-            meeting_id:       meeting._id,
-            meeting_date:     meeting.date,
-            meeting_name:     meeting.name,
-            poll_id:          meeting.activePollId,
-            poll_name:        poll.name,
-            poll_description: poll.description,
-            poll_options:     poll.options
+        console.log('emitPollActive2');
+        Vote.find({ pollId: poll._id }).then(function (votes) {
+            console.log('emitPollActive3', votes);
+            var poll_results = {};
+            var total_votes = 0;
+
+            for(var i = 0; i < poll.options.length; i++) {
+                poll_results[poll.options[i]] = 0;
+            }
+
+            for(var i = 0; i < votes.length; i++) {
+                poll_results[votes[i].val]++;
+                total_votes++;
+            }
+
+            io.sockets.emit('poll active', {
+                group_id:         meeting.group,
+                meeting_id:       meeting._id,
+                meeting_date:     meeting.date,
+                meeting_name:     meeting.name,
+                poll_id:          meeting.activePollId,
+                poll_name:        poll.name,
+                poll_description: poll.description,
+                poll_options:     poll.options,
+                poll_results:     poll_results,
+                total_votes:      total_votes
+            });
         });
     });
 }
 
-function emitNoPollActive(socket, meeting) {
-    socket.emit('no poll active', {
+function emitNoPollActive(io, meeting) {
+    io.sockets.emit('no poll active', {
         group_id:     meeting.group,
         meeting_id:   meeting._id,
         meeting_name: meeting.name,
@@ -69,7 +88,7 @@ module.exports = function (app, cas, server) {
             p.save(function (err, saved) {
                 console.log('Socket ' + socket.id + ' successfully authenticated as ' + details.username + ' on meeting ' + details.meeting_id);
 
-                socket.emit('admin socket authenticated', saved);
+                io.sockets.emit('admin socket authenticated', saved);
 
                 Meeting.findOne({ _id: details.meeting_id }).then(function (meeting) {
                     // invalid meeting
@@ -81,10 +100,10 @@ module.exports = function (app, cas, server) {
                     console.log('the meeting', meeting);
 
                     if(!meeting.activePollId) {
-                        emitNoPollActive(socket, meeting);
+                        emitNoPollActive(io, meeting);
                     } else {
                         console.log("TRYING TO EMIT ACTIVE");
-                        emitPollActive(socket, meeting);
+                        emitPollActive(io, meeting);
                     }
                 });
             });
@@ -132,7 +151,7 @@ module.exports = function (app, cas, server) {
                             if(err) console.error(err);
                             Meeting.update({ _id : meeting._id }, { activePollId: saved._id }).then(function (data) {
                                 console.log('EMITTING ACTIVE');
-                                emitPollActive(socket, meeting);
+                                emitPollActive(io, meeting);
                             });
                         });
                     }, function (err) {
@@ -146,9 +165,23 @@ module.exports = function (app, cas, server) {
             });
         });
 
+        socket.on('close poll', function (username) {
+            Participant.findOne({ clientSocketID: socket.id, username: username }).then(function (participant) {
+                if(!participant) {
+                    socket.emit('not authorized');
+                    return;
+                }
+
+                Meeting.update({ _id: participant.meeting_id }, { activePollId: null }).then(function (meeting) {
+                    emitNoPollActive(io, meeting);
+                })
+            });
+        });
+
         // TODO: receiver for closing a poll
 
         socket.on('submit vote', function (vote_data) {
+            console.log('vote receivd', vote_data);
             if(!vote_data || !vote_data.vote || !vote_data.username) {
                 socket.emit('invalid vote');
                 return;
@@ -171,9 +204,7 @@ module.exports = function (app, cas, server) {
                         if(vote) {
                             Vote.update({ _id : vote._id }, { val: vote_data.vote }).then(function (data) {
                                 socket.emit('vote recorded');
-
-                                // TODO: emit updated stats to admin
-                                socket.emit('admin vote updated', {
+                                io.sockets.emit('admin vote updated', {
                                     new: vote_data.vote,
                                     old: vote.val
                                 });
@@ -188,9 +219,7 @@ module.exports = function (app, cas, server) {
 
                             v.save(function (err, saved) {
                                 socket.emit('vote recorded', saved.val);
-
-                                // TODO: emit updated stats to admin
-                                socket.emit('admin vote added', saved.val);
+                                io.sockets.emit('admin vote added', saved.val);
                             });
                         }
                     });

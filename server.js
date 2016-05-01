@@ -22,16 +22,13 @@ var cms               = require('cms-api')(config.cms_api_token);
 
 //process.env['PORT'] = 2323;
 
-// config files
-var db = require('./config/db');
-
 // set our port
 var port = process.env.PORT || 3000;
-var ip = process.env.IP || "129.161.208.143";
+var ip = process.env.IP || "localhost";
 
 // connect to our mongoDB database
 // (uncomment after you enter in your own credentials in config/db.js)
-mongoose.connect(db.url);
+mongoose.connect(require('./config/db')(ip));
 
 // morgan route logger middleware
 app.use(morgan('dev'));
@@ -67,7 +64,7 @@ app.use(session({
 
 var cas = new CASAuthentication({
     cas_url       : 'https://cas-auth.rpi.edu/cas',
-    service_url   : 'http://localhost:3000/auth?'
+    service_url   : 'http://' + (process.env.IP || 'localhost') + ':' + (process.env.PORT || '3000') + '/auth?'
     // , is_dev_mode   : true
     // , dev_mode_user : 'villat2'
 });

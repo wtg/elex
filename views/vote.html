@@ -82,8 +82,6 @@
             $scope.poll_name = "";
             $scope.poll_active = false;
 
-            // var socket = io.connect('http://localhost:3000');
-
             $http.get('/api/getuser').then(function (response) {
                 console.log(response.data.is_authenticated);
                 if(response.data.is_authenticated) {

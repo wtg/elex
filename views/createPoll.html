@@ -51,11 +51,13 @@
                 <h2>No polls are currently active!</h2>
             </div>
             <div class="col-md-8" style="color: white;" ng-if="poll_active">
-                <h2><button class="btn btn-danger pull-right">Close Poll</button>Active Poll: {{poll_name}}</h2>
+                <h2><button class="btn btn-danger pull-right" ng-click="closePoll()">Close Poll</button>Active Poll: {{poll_name}}</h2>
                 <p>Description: {{poll_description}}</p>
                 <p>Options:</p>
                 <ul>
-                    <li ng-if="poll_options" ng-repeat="o in poll_options">{{ showOptionInfo(o) }}</li>
+                    <li ng-if="poll_options" ng-repeat="o in poll_options">
+                        {{ o }}: {{ poll_results[o] }}/{{ poll_total_votes }}
+                    </li>
                 </ul>
                 <canvas id="chart"></canvas>
             </div>
@@ -92,7 +94,9 @@
 
         var app = angular.module("poll",[]);
         app.controller("poll_ctrl",function($scope,$http){
-            var socket = io.connect('http://localhost:3000');
+            var l = document.createElement("a");
+            l.href = window.location.href;
+            var socket = io.connect('http://' + l.host);
             $scope.new_poll = {
                 poll_name: '',
                 poll_description: '',
@@ -133,12 +137,13 @@
             };
 
             socket.on("poll active", function (data) {
+                console.log(data.poll_results);
                 $scope.poll_active = true;
                 $scope.poll_name = data.poll_name;
                 $scope.poll_description = data.poll_description;
                 $scope.poll_options = data.poll_options || [];
-                $scope.vote_results = {};
-                $scope.poll_total_votes = 0;
+                $scope.poll_results = data.poll_results || {};
+                $scope.poll_total_votes = data.total_votes;
                 $scope.$apply();
             });
 
@@ -147,7 +152,7 @@
                 $scope.poll_name = "";
                 $scope.poll_description = "";
                 $scope.poll_options = [];
-                $scope.vote_results = {};
+                $scope.poll_results = {};
                 $scope.poll_total_votes = 0;
                 $scope.$apply();
             });
@@ -176,24 +181,26 @@
             });
 
             socket.on('admin vote added', function (val) {
-                if(!$scope.vote_results[val]) {
-                    $scope.vote_results[val] = 1;
+                console.log('admin vote added');
+                if(!$scope.poll_results[val]) {
+                    $scope.poll_results[val] = 1;
                 } else {
-                    $scope.vote_results[val]++;
+                    $scope.poll_results[val]++;
                 }
                 $scope.poll_total_votes++;
                 $scope.$apply();
             });
 
             socket.on('admin vote updated', function (vals) {
-                if($scope.vote_results[vals.old]) {
-                    $scope.vote_results[vals.old]--;
+                console.log('admin vote updated');
+                if($scope.poll_results[vals.old]) {
+                    $scope.poll_results[vals.old]--;
                 }
 
-                if(!$scope.vote_results[vals.new]) {
-                    $scope.vote_results[vals.new] = 1;
+                if(!$scope.poll_results[vals.new]) {
+                    $scope.poll_results[vals.new] = 1;
                 } else {
-                    $scope.vote_results[vals.new]++;
+                    $scope.poll_results[vals.new]++;
                 }
                 $scope.$apply();
             })
@@ -211,7 +218,7 @@
                 });
 
                 $scope.clear();
-                createGraph($scope.new_poll.poll_name, )
+                createGraph($scope.new_poll.poll_name, $scope.new_poll.poll_description, $scope.new_poll.poll_options, $scope.username);
             }
 
             $scope.clear = function () {
@@ -223,6 +230,10 @@
             $scope.verifyContents = function() {
                 return $scope.new_poll.poll_name !== '' &&
                        $scope.new_poll.poll_options.length > 0;
+            }
+
+            $scope.closePoll = function() {
+                socket.emit("close poll", $scope.username);
             }
 
 			//------------------------------------------------------------------------------------------------------//
@@ -269,16 +280,6 @@
 			        }
 			    };
 		    }
-
-            $scope.showOptionInfo = function (option) {
-                if(!$scope.poll_results) {
-                    $scope.poll_results = {};
-                } else if (!$scope.poll_results[option]) {
-                    $scope.poll_results[option] = 0;
-                }
-
-                return option + ': ' + $scope.poll_results[option] + '/' + $scope.poll_total_votes;
-            }
         });
     </script>
 </body>
