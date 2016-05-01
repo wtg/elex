@@ -44,7 +44,7 @@
                 </button>
                 <hr style="border-top: 1px solid rgb(80, 88, 105);">
                 <ul class="list-group">
-                    <li class="list-group-item" ng-repeat="u in unique_users" ng-bind="u"></li>
+                    <li class="list-group-item" ng-repeat="u in unique_users">{{u}}</li>
                 </ul>
             </div>
             <div class="col-md-8" style="color: white;">
@@ -138,10 +138,24 @@
             socket.on("admin socket authenticated", function (user_data) {
                 $scope.current_users.push(user_data);
 
-                if($scope.unique_users.indexOf(user_data.username) === -1) {
+                // if($scope.unique_users.indexOf(user_data.username) === -1) {
                     $scope.unique_users.push(user_data.username);
-                }
+                // }
             });
+
+            socket.on("admin socket disconnected", function (socket_id) {
+                var username, index;
+                for(var i = 0; i < $scope.current_users.length; i++) {
+                    if($scope.current_users[i].clientSocketID === socket_id) {
+                        index = i;
+                        username = $scope.current_users[i].username;
+                        break;
+                    }
+                }
+
+                $scope.current_users.splice(index, 1);
+                $scope.unique_users.splice($scope.unique_users.indexOf(username), 1);
+            })
 
 
             $scope.toggle_create = function(){
