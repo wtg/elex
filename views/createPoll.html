@@ -11,7 +11,11 @@
     <div class="container" ng-app="poll" ng-controller="poll_ctrl">
         <div class="row">
             <div class="col-xs-12">
-                <h1 class="text-center" style="color:white">{{meeting_name}}</h1>
+                <h1 class="text-center" style="color:white">
+                    <a ng-href="/meetings/{{group_id}}" ng-if="group_id" class="btn btn-default pull-left">< Back</a>
+                    <a ng-href="/groups" ng-if="!group_id" class="btn btn-default pull-left">< Back</a>
+                    {{meeting_name}}
+                </h1>
             </div>
         </div>
         <div class="row" style="margin-top: 40px;">
@@ -104,6 +108,7 @@
                 poll_options: []
             };
 
+            $scope.group_id = null;
             $scope.meeting_id = null;
             $scope.poll_id = null;
             $scope.poll_name = "";
@@ -142,6 +147,7 @@
             socket.on('join successful', function (data) {
                 $scope.meeting_name = data.meeting_name;
                 $scope.meeting_id = data.meeting_id;
+                $scope.group_id = data.group_id;
             })
 
             socket.on("poll active", function (data) {
@@ -206,7 +212,7 @@
                     } else {
                         $scope.poll_results[vote.val]++;
                     }
-                    
+
                     $scope.$apply(function () {
                         console.log('admin vote added');
                         if(!$scope.poll_results[vote.val]) {

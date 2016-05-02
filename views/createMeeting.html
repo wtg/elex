@@ -27,10 +27,10 @@
 						Submit
 					</button>
 				</form>
-				<form method="get" action="/">
-				<button type="submit" class="btn btn-danger btn-lg group-button text-center">
-					Cancel
-				</button>
+				<form id="cancelForm">
+					<button type="submit" class="btn btn-danger btn-lg group-button text-center">
+						Cancel
+					</button>
 				</form>
 			</div>
 		</div>
@@ -61,6 +61,7 @@
 				}
 
 				$('#group').val(group_id)
+				$('#cancelForm').attr("method","get").attr("action", "/meetings/" + group_id);
 			});
     </script>
 </body>

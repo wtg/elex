@@ -98,10 +98,11 @@ module.exports = function (app, cas, server) {
                     }
 
                     socket.emit('join successful', {
+                        group_id: meeting.group,
                         meeting_id: meeting._id,
                         meeting_name: meeting.name
                     });
-                    
+
                     try {
                     if(!meeting.activePollId) {
                         emitNoPollActive(io, meeting);
@@ -190,10 +191,20 @@ module.exports = function (app, cas, server) {
             });
         });
 
-        // TODO: receiver for closing a poll
+        socket.on('request vote', function (username) {
+            Participant.findOne({ clientSocketID: socket.id, username: username }).then(function (participant) {
+                if(!participant) {
+                    socket.emit('not authorized');
+                    return;
+                }
+
+                Vote.findOne({ username: participant.username }).then(function (vote) {
+                    socket.emit('vote recorded', vote.val);
+                })
+            });
+        });
 
         socket.on('submit vote', function (vote_data) {
-            console.log('vote receivd', vote_data);
             if(!vote_data || !vote_data.vote || !vote_data.username) {
                 socket.emit('invalid vote');
                 return;
@@ -215,7 +226,7 @@ module.exports = function (app, cas, server) {
                     Vote.findOne({ username: vote_data.username, pollId: meeting.activePollId }).then(function (vote) {
                         if(vote) {
                             Vote.update({ _id : vote._id }, { val: vote_data.vote }).then(function (data) {
-                                socket.emit('vote recorded');
+                                socket.emit('vote recorded', vote_data.vote);
                                 io.sockets.emit('admin vote updated', {
                                     meeting_id: participant.meeting_id,
                                     new: vote_data.vote,
@@ -252,11 +263,11 @@ module.exports = function (app, cas, server) {
     	Meeting.findOne({"_id" : req.params.key}, function(err, meet){
 			console.log('/polls/' + req.params.key, meet);
     		Group.findOne({"_id" : meet.group}, function(err, group) {
-    			if(group.admin == rcsID) {
-    				res.sendFile(path.resolve('views/polls.html'));
-    			}else{
+    			// if(group.admin == rcsID) {
+            	    // res.sendFile(path.resolve('views/createPoll.html'));
+    			// }else{
     				res.sendFile(path.resolve('views/pin.html'));
-    			}
+    			// }
     		});
     	});
 	});

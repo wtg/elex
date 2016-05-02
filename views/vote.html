@@ -12,13 +12,15 @@
         <div ng-if="poll_active">
             <div class="row">
                 <div class="col-xs-12">
-                    <h1 class="text-center header">{{meeting_name}} &ndash; {{meeting_date}}</h1>
-                    <h2 class="text-center vote-details">You are voting on: {{poll_name}}</h2>
+                    <h1 class="text-center header">Meeting: {{meeting_name}}</h1>
+                    <h2 class="text-center vote-details">You are voting on: {{poll_name}}<br ng-if="current_vote" />
+                    <span style="font-size: 20px" ng-if="current_vote">You've successfully voted! To change your vote, choose another button.</span></h2>
                 </div>
             </div>
             <div class="row vote-buttons">
                 <div ng-repeat="value in poll_options" class="col-md-4 text-center">
-                    <button class="btn btn-default btn-lg vote-button" ng-click = "vote(value)">
+                    <button class="btn btn-lg vote-button" ng-click = "vote(value)"
+                            ng-class="{'btn-success': isCurrentVote(value), 'btn-default': !isCurrentVote(value)}">
                         <i class="fa fa-thumbs-up"></i>
                         {{value}}
                     </button>
@@ -81,6 +83,7 @@
             $scope.poll_id = "";
             $scope.poll_name = "";
             $scope.poll_active = false;
+            $scope.current_vote = null;
 
             $http.get('/api/getuser').then(function (response) {
                 console.log(response.data.is_authenticated);
@@ -118,6 +121,11 @@
                 //do something
             });
 
+            socket.on("vote recorded", function (val) {
+                $scope.current_vote = val;
+                $scope.$apply();
+            })
+
             socket.on('poll active', function (data) {
                 console.log('poll active');
                 //get clubname
@@ -134,10 +142,18 @@
                 $scope.poll_name = data["poll_name"];
                 $scope.poll_description = data["poll_description"];
                 $scope.poll_active = true;
+
+                socket.emit('request vote', $scope.username);
             });
 
             $scope.vote = function(val) {
                 socket.emit('submit vote', {vote: String(val), username: $scope.username});
+            }
+
+            $scope.isCurrentVote = function (val) {
+                console.log($scope.current_vote);
+                console.log(val);
+                return $scope.current_vote === val;
             }
         });
     </script>

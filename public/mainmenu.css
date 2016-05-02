@@ -25,3 +25,9 @@
   color: white;
   font-size: 20px;
 }
+.no-meetings {
+  color: white;
+  margin: 0;
+  text-align: center;
+  font-size: 30px;
+}
