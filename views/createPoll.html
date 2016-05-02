@@ -56,7 +56,7 @@
                 <p>Options:</p>
                 <ul>
                     <li ng-if="poll_options" ng-repeat="o in poll_options">
-                        {{ o }}: {{ poll_results[o] }}/{{ poll_total_votes }}
+                        {{ o }}: {{ poll_results[o] }}/{{ poll_total_votes() }}
                     </li>
                 </ul>
 			    <div id="canvas-holder" style="width:75%">
@@ -111,7 +111,6 @@
             $scope.meeting_name = '';
             $scope.poll_options = [];
             $scope.poll_results = {};
-            $scope.poll_total_votes = 0;
             $scope.username = "";
             $scope.poll_active = false;
             $scope.current_users = [];
@@ -147,15 +146,12 @@
 
             socket.on("poll active", function (data) {
                 if($scope.meeting_id === data.meeting_id && $scope.poll_id !== data.poll_id) {
-                    console.log('poll active', $scope.meeting_id);
-                    console.log(data.poll_results);
                     $scope.poll_id = data.poll_id;
                     $scope.poll_active = true;
                     $scope.poll_name = data.poll_name;
                     $scope.poll_description = data.poll_description;
                     $scope.poll_options = data.poll_options || [];
                     $scope.poll_results = data.poll_results || {};
-                    $scope.poll_total_votes = data.total_votes;
                     $scope.$apply();
                 }
             });
@@ -169,7 +165,6 @@
                     $scope.poll_description = "";
                     $scope.poll_options = [];
                     $scope.poll_results = {};
-                    $scope.poll_total_votes = 0;
                     $scope.$apply();
                 }
             });
@@ -203,7 +198,15 @@
             });
 
             socket.on('admin vote added', function (vote) {
+                console.log('vote added', vote);
                 if($scope.meeting_id === vote.meeting_id) {
+                    console.log('admin vote added');
+                    if(!$scope.poll_results[vote.val]) {
+                        $scope.poll_results[vote.val] = 1;
+                    } else {
+                        $scope.poll_results[vote.val]++;
+                    }
+                    
                     $scope.$apply(function () {
                         console.log('admin vote added');
                         if(!$scope.poll_results[vote.val]) {
@@ -333,6 +336,14 @@
 
             $scope.closePoll = function() {
                 socket.emit("close poll", $scope.username);
+            }
+
+            $scope.poll_total_votes = function () {
+                var total = 0;
+                for(var i in $scope.poll_results) {
+                    total += $scope.poll_results[i];
+                }
+                return total;
             }
 		});
 	</script>
