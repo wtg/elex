@@ -97,8 +97,11 @@ module.exports = function (app, cas, server) {
                         return;
                     }
 
-                    socket.emit('join successful', meeting._id);
-                    console.log("HERE");
+                    socket.emit('join successful', {
+                        meeting_id: meeting._id,
+                        meeting_name: meeting.name
+                    });
+                    
                     try {
                     if(!meeting.activePollId) {
                         emitNoPollActive(io, meeting);

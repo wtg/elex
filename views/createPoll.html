@@ -11,7 +11,7 @@
     <div class="container" ng-app="poll" ng-controller="poll_ctrl">
         <div class="row">
             <div class="col-xs-12">
-                <h1 class="text-center" style="color:white">Meeting for The Poly</h1>
+                <h1 class="text-center" style="color:white">{{meeting_name}}</h1>
             </div>
         </div>
         <div class="row" style="margin-top: 40px;">
@@ -108,6 +108,7 @@
             $scope.poll_id = null;
             $scope.poll_name = "";
             $scope.poll_description = "";
+            $scope.meeting_name = '';
             $scope.poll_options = [];
             $scope.poll_results = {};
             $scope.poll_total_votes = 0;
@@ -139,8 +140,9 @@
                 $scope.poll_options.splice(index, 1);
             };
 
-            socket.on('join successful', function (meeting_id) {
-                $scope.meeting_id = meeting_id;
+            socket.on('join successful', function (data) {
+                $scope.meeting_name = data.meeting_name;
+                $scope.meeting_id = data.meeting_id;
             })
 
             socket.on("poll active", function (data) {
