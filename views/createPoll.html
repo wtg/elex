@@ -59,7 +59,9 @@
                         {{ o }}: {{ poll_results[o] }}/{{ poll_total_votes }}
                     </li>
                 </ul>
-                <canvas id="chart"></canvas>
+			    <div id="canvas-holder" style="width:75%">
+			        <canvas id="chart" />
+			    </div>
             </div>
         </div>
 
@@ -84,7 +86,6 @@
 
     <script>
         var meeting_id = window.location.href.split('/').pop();
-		var ctx = $("#chart");
 
         // remove any trailing '?'s
         if(meeting_id[meeting_id.length - 1] === '?') {
@@ -201,14 +202,21 @@
 
             socket.on('admin vote added', function (vote) {
                 if($scope.meeting_id === vote.meeting_id) {
-                    console.log('admin vote added');
-                    if(!$scope.poll_results[val]) {
-                        $scope.poll_results[val] = 1;
-                    } else {
-                        $scope.poll_results[val]++;
-                    }
-                    $scope.poll_total_votes++;
-                    $scope.$apply();
+                    $scope.$apply(function () {
+                        console.log('admin vote added');
+                        if(!$scope.poll_results[val]) {
+                            $scope.poll_results[val] = 1;
+                        } else {
+                            $scope.poll_results[val]++;
+                        }
+                        $scope.poll_total_votes++;
+                        for(var i = 0; i < config.data.datasets.labels.length; ++i){
+    						if(config.data.datasets.labels[i] == val){
+    							++config.data.datasets.data[i];
+    						}
+    					}
+    					window.myDoughnut.update();
+                    });
                 }
             });
 
@@ -241,7 +249,51 @@
                 });
 
                 $scope.clear();
-                createGraph($scope.new_poll.poll_name, $scope.new_poll.poll_description, $scope.new_poll.poll_options, $scope.username);
+                var randomScalingFactor = function() {
+			        return Math.round(Math.random() * 100);
+			    };
+			    var randomColorFactor = function() {
+			        return Math.round(Math.random() * 255);
+			    };
+			    var randomColor = function(opacity) {
+			        return 'rgba(' + randomColorFactor() + ',' + randomColorFactor() + ',' + randomColorFactor() + ',' + (opacity || '.3') + ')';
+			    };
+			    //------------------------------------------------------------------------------------------------------//
+			    var color = [];
+			    var zeros = [];
+			    for(var i = 0; i < $scope.new_poll.poll_options.length; i++) {
+				    color.push(randomColor);
+				    zeros.push(0);
+				}
+			    var config = {
+			        type: 'pie',
+			        data: {
+			            datasets: [{
+			                data: zeros,
+			                backgroundColor: color,
+			                label: 'Dataset 1'
+			            }],
+			            labels: $scope.new_poll.poll_options
+			        },
+			        options: {
+			            responsive: true,
+			            legend: {
+			                position: 'top',
+			            },
+			            title: {
+			                display: true,
+			                text: 'Chart.js Doughnut Chart'
+			            },
+			            animation: {
+			                animateScale: true,
+			                animateRotate: true
+			            }
+			        }
+			    };
+			    var ctx = $("#chart");
+			    window.myDoughnut = new Chart(ctx, config);
+
+				$scope.clear();
             }
 
             $scope.clear = function () {
@@ -258,52 +310,7 @@
             $scope.closePoll = function() {
                 socket.emit("close poll", $scope.username);
             }
-
-			//------------------------------------------------------------------------------------------------------//
-		    var randomScalingFactor = function() {
-		        return Math.round(Math.random() * 100);
-		    };
-		    var randomColorFactor = function() {
-		        return Math.round(Math.random() * 255);
-		    };
-		    var randomColor = function(opacity) {
-		        return 'rgba(' + randomColorFactor() + ',' + randomColorFactor() + ',' + randomColorFactor() + ',' + (opacity || '.3') + ')';
-		    };
-		    function createGraph(name, desc, opts, user){
-		    	window.myPie = new Chart(ctx, config);
-		    	var colors = [];
-		    	var zeros = [];
-		    	opts.forEach(function(opt){
-		    		colors.push(randomColor(1));
-		    		zeros.push(0);
-		    	});
-
-			    var config = {
-			        type: 'pie',
-			        data: {
-			            datasets: [{
-			                data: zeros,
-			                backgroundColor: colors
-			            }],
-			            labels: opts
-			        },
-			        options: {
-			            responsive: true,
-			            legend: {
-			                position: 'top',
-			            },
-			            title: {
-			                display: false,
-			                text: name
-			            },
-			            animation: {
-			                animateScale: true,
-			                animateRotate: true
-			            }
-			        }
-			    };
-		    }
-        });
-    </script>
+		});
+	</script>
 </body>
 </html>
