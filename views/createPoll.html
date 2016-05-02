@@ -214,12 +214,19 @@
 
                         $scope.poll_total_votes++;
 
-                        for(var i = 0; i < config.data.datasets.labels.length; ++i){
-    						if(config.data.datasets.labels[i] == vote.val){
-    							++config.data.datasets.data[i];
-    						}
-    					}
-    					window.myDoughnut.update();
+
+	                    $.each(config.data.datasets, function(i, dataset) {
+	                    	for(var i = 0; i < dataset.data.length; ++i){
+	                    		if(config.data.labels[i] == vals.new){
+	                    			dataset.data[i]++;
+	                    		}
+	                    		if(config.data.labels[i] == vals.old){
+	                    			dataset.data[i]--;
+	                    		}
+	                    	}
+				            dataset.data[0] = dataset.data[0] + 1;
+				        });
+						window.myDoughnut.update();
                     });
                 }
             });
@@ -236,6 +243,19 @@
                     } else {
                         $scope.poll_results[vals.new]++;
                     }
+
+                    $.each(config.data.datasets, function(i, dataset) {
+                    	for(var i = 0; i < dataset.data.length; ++i){
+                    		if(config.data.labels[i] == vals.new){
+                    			dataset.data[i]++;
+                    		}
+                    		if(config.data.labels[i] == vals.old){
+                    			dataset.data[i]--;
+                    		}
+                    	}
+			            dataset.data[0] = dataset.data[0] + 1;
+			        });
+					window.myDoughnut.update();
                     $scope.$apply();
                 }
             })
@@ -252,7 +272,6 @@
                     username: $scope.username
                 });
 
-                $scope.clear();
                 var randomScalingFactor = function() {
 			        return Math.round(Math.random() * 100);
 			    };
@@ -266,10 +285,10 @@
 			    var color = [];
 			    var zeros = [];
 			    for(var i = 0; i < $scope.new_poll.poll_options.length; i++) {
-				    color.push(randomColor);
+				    color.push(randomColor(.7));
 				    zeros.push(0);
 				}
-			    var config = {
+			    config = {
 			        type: 'pie',
 			        data: {
 			            datasets: [{
@@ -296,6 +315,7 @@
 			    };
 			    var ctx = $("#chart");
 			    window.myDoughnut = new Chart(ctx, config);
+			    console.log(myDoughnut);
 
 				$scope.clear();
             }
