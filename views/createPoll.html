@@ -206,14 +206,16 @@
                 if($scope.meeting_id === vote.meeting_id) {
                     $scope.$apply(function () {
                         console.log('admin vote added');
-                        if(!$scope.poll_results[val]) {
-                            $scope.poll_results[val] = 1;
+                        if(!$scope.poll_results[vote.val]) {
+                            $scope.poll_results[vote.val] = 1;
                         } else {
-                            $scope.poll_results[val]++;
+                            $scope.poll_results[vote.val]++;
                         }
+
                         $scope.poll_total_votes++;
+
                         for(var i = 0; i < config.data.datasets.labels.length; ++i){
-    						if(config.data.datasets.labels[i] == val){
+    						if(config.data.datasets.labels[i] == vote.val){
     							++config.data.datasets.data[i];
     						}
     					}
