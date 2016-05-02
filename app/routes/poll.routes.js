@@ -263,11 +263,11 @@ module.exports = function (app, cas, server) {
     	Meeting.findOne({"_id" : req.params.key}, function(err, meet){
 			console.log('/polls/' + req.params.key, meet);
     		Group.findOne({"_id" : meet.group}, function(err, group) {
-    			// if(group.admin == rcsID) {
-            	    // res.sendFile(path.resolve('views/createPoll.html'));
-    			// }else{
+    			if(group.admin == rcsID) {
+            	    res.sendFile(path.resolve('views/createPoll.html'));
+    			} else {
     				res.sendFile(path.resolve('views/pin.html'));
-    			// }
+    			}
     		});
     	});
 	});
