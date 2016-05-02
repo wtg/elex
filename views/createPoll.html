@@ -96,6 +96,17 @@
             meeting_id = meeting_id.slice(0, -1);
         }
 
+        var randomScalingFactor = function() {
+	        return Math.round(Math.random() * 100);
+	    };
+	    var randomColorFactor = function() {
+	        return Math.round(Math.random() * 255);
+	    };
+	    var randomColor = function(opacity) {
+	        return 'rgba(' + randomColorFactor() + ',' + randomColorFactor() + ',' + randomColorFactor() + ',' + (opacity || '.3') + ')';
+	    };
+
+
 
         var app = angular.module("poll",[]);
         app.controller("poll_ctrl",function($scope,$http){
@@ -159,6 +170,41 @@
                     $scope.poll_options = data.poll_options || [];
                     $scope.poll_results = data.poll_results || {};
                     $scope.$apply();
+
+	                //------------------------------------------------------------------------------------------------------//
+				    var color = [];
+				    var results = [];
+				    for(var i = 0; i < $scope.poll_options.length; i++) {
+					    color.push(randomColor(.7));
+					    results.push($scope.poll_results[$scope.poll_options[i]]);
+					}
+				    config = {
+				        type: 'pie',
+				        data: {
+				            datasets: [{
+				                data: results,
+				                backgroundColor: color,
+				                label: 'Dataset 1'
+				            }],
+				            labels: $scope.poll_options
+				        },
+				        options: {
+				            responsive: true,
+				            legend: {
+				                position: 'top',
+				            },
+				            title: {
+				                display: true,
+				                text: 'Vote Results'
+				            },
+				            animation: {
+				                animateScale: true,
+				                animateRotate: true
+				            }
+				        }
+				    };
+				    var ctx = $("#chart");
+				    window.myDoughnut = new Chart(ctx, config);
                 }
             });
 
@@ -204,39 +250,39 @@
             });
 
             socket.on('admin vote added', function (vote) {
-                console.log('vote added', vote);
                 if($scope.meeting_id === vote.meeting_id) {
-                    console.log('admin vote added');
+                    console.log('admin vote added', vote);
+                    console.log($scope.poll_results[vote.val]);
+
                     if(!$scope.poll_results[vote.val]) {
                         $scope.poll_results[vote.val] = 1;
                     } else {
                         $scope.poll_results[vote.val]++;
                     }
 
-                    $scope.$apply(function () {
-                        console.log('admin vote added');
-                        if(!$scope.poll_results[vote.val]) {
-                            $scope.poll_results[vote.val] = 1;
-                        } else {
-                            $scope.poll_results[vote.val]++;
-                        }
-
-                        $scope.poll_total_votes++;
-
-
-	                    $.each(config.data.datasets, function(i, dataset) {
-	                    	for(var i = 0; i < dataset.data.length; ++i){
-	                    		if(config.data.labels[i] == vals.new){
-	                    			dataset.data[i] = $scope.poll_results[vals.new];
-	                    		}
-	                    		if(config.data.labels[i] == vals.old){
-	                    			dataset.data[i] = $scope.poll_results[vals.old];
-	                    		}
-	                    	}
-				        });
-						window.myDoughnut.update();
-                    });
+                    $.each(config.data.datasets, function(i, dataset) {
+                    	for(var i = 0; i < dataset.data.length; ++i){
+                    		if(config.data.labels[i] == vote.val) {
+                    			dataset.data[i] = $scope.poll_results[vote.val];
+                    		}
+                    	}
+			        });
+					window.myDoughnut.update();
+                    $scope.$apply();
                 }
+
+
+     //                $.each(config.data.datasets, function(i, dataset) {
+     //                	for(var i = 0; i < dataset.data.length; ++i){
+     //                		if(config.data.labels[i] == vals.new){
+     //                			dataset.data[i] = $scope.poll_results[vals.new];
+     //                		}
+     //                		if(config.data.labels[i] == vals.old){
+     //                			dataset.data[i] = $scope.poll_results[vals.old];
+     //                		}
+     //                	}
+			  //       });
+					// window.myDoughnut.update();
             });
 
             socket.on('admin vote updated', function (vals) {
@@ -278,17 +324,7 @@
                     options: $scope.new_poll.poll_options,
                     username: $scope.username
                 });
-
-                var randomScalingFactor = function() {
-			        return Math.round(Math.random() * 100);
-			    };
-			    var randomColorFactor = function() {
-			        return Math.round(Math.random() * 255);
-			    };
-			    var randomColor = function(opacity) {
-			        return 'rgba(' + randomColorFactor() + ',' + randomColorFactor() + ',' + randomColorFactor() + ',' + (opacity || '.3') + ')';
-			    };
-			    //------------------------------------------------------------------------------------------------------//
+                //------------------------------------------------------------------------------------------------------//
 			    var color = [];
 			    var zeros = [];
 			    for(var i = 0; i < $scope.new_poll.poll_options.length; i++) {
@@ -312,7 +348,7 @@
 			            },
 			            title: {
 			                display: true,
-			                text: 'Chart.js Doughnut Chart'
+			                text: 'Vote Results'
 			            },
 			            animation: {
 			                animateScale: true,
