@@ -86,6 +86,7 @@
     crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+    <!-- for using chart.js -->
     <script src="/Chart/dist/Chart.bundle.js"></script>
 
     <script>
@@ -96,16 +97,13 @@
             meeting_id = meeting_id.slice(0, -1);
         }
 
-        var randomScalingFactor = function() {
-	        return Math.round(Math.random() * 100);
-	    };
+        //for creating a random color
 	    var randomColorFactor = function() {
 	        return Math.round(Math.random() * 255);
 	    };
 	    var randomColor = function(opacity) {
 	        return 'rgba(' + randomColorFactor() + ',' + randomColorFactor() + ',' + randomColorFactor() + ',' + (opacity || '.3') + ')';
 	    };
-
 
 
         var app = angular.module("poll",[]);
@@ -172,12 +170,15 @@
                     $scope.$apply();
 
 	                //------------------------------------------------------------------------------------------------------//
+                    //variables for holding colors and data points
 				    var color = [];
 				    var results = [];
 				    for(var i = 0; i < $scope.poll_options.length; i++) {
 					    color.push(randomColor(.7));
 					    results.push($scope.poll_results[$scope.poll_options[i]]);
 					}
+
+                    //configuration for data visualization
 				    config = {
 				        type: 'pie',
 				        data: {
@@ -203,6 +204,8 @@
 				            }
 				        }
 				    };
+
+                    //output the chart
 				    var ctx = $("#chart");
 				    window.myDoughnut = new Chart(ctx, config);
                 }
@@ -260,6 +263,7 @@
                         $scope.poll_results[vote.val]++;
                     }
 
+                    //add vote to data visualization
                     $.each(config.data.datasets, function(i, dataset) {
                     	for(var i = 0; i < dataset.data.length; ++i){
                     		if(config.data.labels[i] == vote.val) {
@@ -267,22 +271,10 @@
                     		}
                     	}
 			        });
+                    //apply changes
 					window.myDoughnut.update();
                     $scope.$apply();
                 }
-
-
-     //                $.each(config.data.datasets, function(i, dataset) {
-     //                	for(var i = 0; i < dataset.data.length; ++i){
-     //                		if(config.data.labels[i] == vals.new){
-     //                			dataset.data[i] = $scope.poll_results[vals.new];
-     //                		}
-     //                		if(config.data.labels[i] == vals.old){
-     //                			dataset.data[i] = $scope.poll_results[vals.old];
-     //                		}
-     //                	}
-			  //       });
-					// window.myDoughnut.update();
             });
 
             socket.on('admin vote updated', function (vals) {
@@ -298,6 +290,7 @@
                         $scope.poll_results[vals.new]++;
                     }
 
+                    //add vote to data visualization
                     $.each(config.data.datasets, function(i, dataset) {
                     	for(var i = 0; i < dataset.data.length; ++i){
                     		if(config.data.labels[i] == vals.new){
@@ -308,6 +301,7 @@
                     		}
                     	}
 			        });
+                    //apply changes
 					window.myDoughnut.update();
                     $scope.$apply();
                 }
@@ -325,12 +319,15 @@
                     username: $scope.username
                 });
                 //------------------------------------------------------------------------------------------------------//
+                    //variables for holding colors and data points
 			    var color = [];
 			    var zeros = [];
 			    for(var i = 0; i < $scope.new_poll.poll_options.length; i++) {
 				    color.push(randomColor(.7));
 				    zeros.push(0);
 				}
+
+                //configuration for data visualization
 			    config = {
 			        type: 'pie',
 			        data: {
